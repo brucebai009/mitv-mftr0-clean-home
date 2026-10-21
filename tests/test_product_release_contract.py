@@ -8,8 +8,8 @@ STRINGS = ROOT / "launcher" / "app" / "src" / "main" / "res" / "values" / "strin
 
 def test_release_is_unsigned_and_v13_candidate_version_is_locked():
     text = BUILD_GRADLE.read_text(encoding="utf-8")
-    assert "versionCode 8" in text
-    assert "versionName '1.0.0-v13.1'" in text
+    assert "versionCode 9" in text
+    assert "versionName '1.0.0-v13.2'" in text
     assert "signingConfig = null" in text
     assert "signingConfig signingConfigs.debug" not in text
 
