@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   build:
@@ -102,6 +103,28 @@ jobs:
               print(f"::error title={issue_id}{suffix}::{message[:900]}")
           PY
           fi
+      - name: Publish machine-readable failure log
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const log = fs.existsSync('build-output.log')
+              ? fs.readFileSync('build-output.log', 'utf8')
+              : 'build-output.log was not produced';
+            const summary = log.slice(-60000);
+            await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Gradle failure details',
+              head_sha: context.sha,
+              status: 'completed',
+              conclusion: 'failure',
+              output: {
+                title: 'SDK34 Gradle failure log',
+                summary
+              }
+            });
       - name: Check product artifact
         shell: bash
         run: |
