@@ -130,8 +130,11 @@ final class WallpaperImport {
     private static String extension(String name) {
         if (name == null) return null;
         String value = name.toLowerCase(Locale.ROOT);
+        int separator = Math.max(value.lastIndexOf('/'), value.lastIndexOf('\\'));
         int dot = value.lastIndexOf('.');
-        return dot >= 0 && dot + 1 < value.length() ? value.substring(dot + 1) : null;
+        if (dot <= separator || dot + 1 >= value.length()) return null;
+        String extension = value.substring(dot + 1);
+        return extension.matches("[a-z0-9]{1,8}") ? extension : null;
     }
 
     private static String hex(byte[] bytes) {
