@@ -139,6 +139,11 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static float bottomRoomDp(int rowsBelowDock) {
         return rowsBelowDock <= 0 ? 0f : BOTTOM_ROOM_DP;
     }
+
+    /** Top padding that parks a dock-only first row at the bottom edge of its viewport. */
+    static int dockTopPaddingPx(int gridHeightPx, int itemHeightPx, float density) {
+        return Math.max(0, gridHeightPx - itemHeightPx - Math.round(DOCK_EXTRA_DP * density));
+    }
     /** Room kept above the dock for the dock title (48sp name plus its compact gap) when dock_title is on. */
     static final float TITLE_ROOM_DP = 95;
     /** dock_row false: room above the first row for its zoom and glass (MainActivity places the grid with it). */

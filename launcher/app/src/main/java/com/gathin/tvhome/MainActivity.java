@@ -177,6 +177,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private boolean reducedMotion;
     /** config.xml dock_row: the first row is a separate dock (band, parked low, top shelf) rather than plain grid. */
     private boolean dockRow;
+    /** Configured rows below the dock; zero means the dock-only first row must stay at the viewport bottom. */
+    private int rowsBelowDock;
     /** Festive skin from the theme (see Festival); applied while it is active today. */
     private Festival festival = Festival.NONE;
     private boolean festive;
@@ -431,7 +433,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
         // tvOS layout: push the dock row towards the bottom of the screen, leaving room for
         // rows_below_dock grid rows under it; the rest of the grid stays below until you press Down.
-        int rowsBelowDock = cfg.rowsBelowDock;
+        rowsBelowDock = cfg.rowsBelowDock;
         grid.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
             int h = b - t;
             // Item height follows the tile size, which follows the columns and the rows that must fit (AppAdapter.tileWidthPx).
@@ -456,6 +458,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // Cold start or column count > 4: the first focus can run before the grid has its final width or
             // padding, leaving the glass at the XML design size until a key is pressed.
             grid.post(this::refitGlass);
+            if (dockRow && rowsBelowDock <= 0) grid.post(this::parkDockOnlyRow);
         });
 
         // Keep the glass glued to its tile while the grid scrolls.
@@ -1144,6 +1147,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         View item = (View) card.getParent();
         if (dockRow && position < COLUMNS) {
             // Dock: park it at the bottom of the screen and show the top shelf for this app.
+            if (rowsBelowDock <= 0) {
+                parkDockOnlyRow();
+                // Changing the padding requests a relayout; do not immediately scroll using the old
+                // child coordinates, or the RecyclerView can undo the bottom parking on cold start.
+                showHero(position, r.top);
+                return;
+            }
             int decoratedTop = item.getTop() - (int) (6 * density);
             int dy = decoratedTop - grid.getPaddingTop();
             // A 1px mismatch used to start a scroll on every dock move. Only scroll when the row is
@@ -1161,6 +1171,17 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // Scroll just enough so the whole glass (not only the tile) is visible.
             revealRect.set(0, -(int) pad * 2, item.getWidth(), item.getHeight() + (int) pad);
             grid.requestChildRectangleOnScreen(item, revealRect, reducedMotion);
+        }
+    }
+
+    /** Keeps a zero-row dock at the bottom after focus restoration or Home re-entry. */
+    private void parkDockOnlyRow() {
+        if (!dockRow || rowsBelowDock > 0 || grid == null || grid.getHeight() <= 0) return;
+        RecyclerView.ViewHolder holder = grid.findViewHolderForAdapterPosition(0);
+        if (holder == null) return;
+        int target = AppAdapter.dockTopPaddingPx(grid.getHeight(), holder.itemView.getHeight(), density);
+        if (grid.getPaddingTop() != target) {
+            grid.setPadding(grid.getPaddingLeft(), target, grid.getPaddingRight(), grid.getPaddingBottom());
         }
     }
 

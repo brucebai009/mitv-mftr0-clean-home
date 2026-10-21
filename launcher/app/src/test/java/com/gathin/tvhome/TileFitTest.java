@@ -32,6 +32,14 @@ public class TileFitTest {
     }
 
     @Test
+    public void dockOnlyRowIsParkedAfterTheViewportSoTheNextRowStartsOutsideIt() {
+        int item = 315;
+        int target = AppAdapter.dockTopPaddingPx(924, item, 3.3333333f);
+        assertEquals(549, target);
+        assertTrue(target + item + Math.round(AppAdapter.DOCK_EXTRA_DP * 3.3333333f) >= 924);
+    }
+
+    @Test
     public void dockTitleAndRowsFitTheHeightUnlessThatMeansTinyTiles() {
         int floor = Math.round(AppAdapter.tileWidthPx(INNER, 4, D) * AppAdapter.MIN_HEIGHT_FIT);
         for (int rows = 1; rows <= 3; rows++) {
