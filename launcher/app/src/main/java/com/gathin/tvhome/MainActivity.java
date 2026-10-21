@@ -41,7 +41,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.util.Log;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -88,7 +87,6 @@ import java.util.Set;
  * tvOS style home: black, a pinned dock row, an app grid, and one glass highlight that springs between tiles.
  */
 public class MainActivity extends Activity implements AppAdapter.TileListener {
-    private static final String TAG = "TvHome.MainActivity";
 
     private static final int LAUNCHER_SETTINGS_REQUEST = 42;
     /** Sent by QuickSettingsActivity: open Launcher settings from here so Home rebuilds when they close. */
@@ -1180,14 +1178,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private void parkDockOnlyRow() {
         if (!dockRow || rowsBelowDock > 0 || grid == null || grid.getHeight() <= 0) return;
         RecyclerView.ViewHolder holder = grid.findViewHolderForAdapterPosition(0);
-        if (holder == null) {
-            Log.i(TAG, "dock park skipped: no first holder; grid=" + grid.getHeight());
-            return;
-        }
+        if (holder == null) return;
         int target = AppAdapter.dockTopPaddingPx(grid.getHeight(), holder.itemView.getHeight(), density);
-        Log.i(TAG, "dock park: grid=" + grid.getHeight() + " item=" + holder.itemView.getHeight()
-                + " target=" + target + " oldPad=" + grid.getPaddingTop()
-                + " firstTop=" + holder.itemView.getTop());
         if (grid.getPaddingTop() != target) {
             grid.setPadding(grid.getPaddingLeft(), target, grid.getPaddingRight(), grid.getPaddingBottom());
         }
