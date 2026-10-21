@@ -6,6 +6,7 @@ param(
     [string]$StateRoot = (Join-Path $PSScriptRoot 'tvhome-state'),
     [string]$ExpectedModel,
     [string]$ExpectedFingerprint,
+    [string]$OriginalSnapshotPath,
     [switch]$ActivateHome
 )
 
@@ -47,8 +48,51 @@ function Read-HomeComponent {
     return $line.Trim()
 }
 
-function Read-Foreground {
-    return Invoke-AdbText @('shell', 'dumpsys', 'activity', 'activities')
+function Normalize-Component([string]$Value) {
+    if ([string]::IsNullOrWhiteSpace($Value) -or $Value -notmatch '^([A-Za-z0-9._]+)/([A-Za-z0-9.$_]+)$') { return '' }
+    $package = $matches[1]
+    $class = $matches[2]
+    if ($class.StartsWith('.')) { $class = $package + $class }
+    elseif ($class -notmatch '\.') { $class = "$package.$class" }
+    return "$package/$class"
+}
+
+function Read-ForegroundState {
+    $activity = Invoke-AdbText @('shell', 'dumpsys', 'activity', 'activities')
+    $window = Invoke-AdbText @('shell', 'dumpsys', 'window')
+    $resumed = ''
+    foreach ($line in ($activity -split '\r?\n')) {
+        if ($line -match '(?:topResumedActivity|mResumedActivity)[:=].*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $resumed = Normalize-Component $matches[1]
+            break
+        }
+    }
+    $currentFocus = ''
+    $focusedApp = ''
+    foreach ($line in ($window -split '\r?\n')) {
+        if (-not $currentFocus -and $line -match 'mCurrentFocus=.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $currentFocus = Normalize-Component $matches[1]
+        }
+        if (-not $focusedApp -and $line -match 'mFocusedApp=.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $focusedApp = Normalize-Component $matches[1]
+        }
+    }
+    return [pscustomobject]@{ Resumed = $resumed; CurrentFocus = $currentFocus; FocusedApp = $focusedApp }
+}
+
+function Wait-Foreground([string]$ExpectedComponent, [int]$TimeoutSeconds = 10) {
+    $expected = Normalize-Component $ExpectedComponent
+    if (-not $expected) { throw "Expected foreground component is invalid: $ExpectedComponent" }
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $last = $null
+    do {
+        $last = Read-ForegroundState
+        if ($last.Resumed -eq $expected -and $last.CurrentFocus -eq $expected -and $last.FocusedApp -eq $expected) {
+            return $last
+        }
+        Start-Sleep -Milliseconds 500
+    } while ((Get-Date) -lt $deadline)
+    throw "Foreground readback did not stabilize on $expected (resumed=$($last.Resumed); currentFocus=$($last.CurrentFocus); focusedApp=$($last.FocusedApp))."
 }
 
 if ([string]::IsNullOrWhiteSpace($Serial)) { throw 'Serial is required; no device address is built in.' }
@@ -80,9 +124,46 @@ if ($ExpectedModel -and $ExpectedModel -ne $model) { throw "Unexpected model: $m
 if ($ExpectedFingerprint -and $ExpectedFingerprint -ne $fingerprint) { throw 'Unexpected firmware fingerprint.' }
 Write-Journal "DEVICE model=$model user=$user serial=$actualSerial"
 
-$originalHome = Read-HomeComponent
-$originalPackage = $originalHome.Split('/')[0]
+$preInstallHome = Read-HomeComponent
+$baselineSnapshot = $null
+if ($OriginalSnapshotPath) {
+    $baselinePath = (Resolve-Path -LiteralPath $OriginalSnapshotPath -ErrorAction Stop).Path
+    $baselineSnapshot = Get-Content -LiteralPath $baselinePath -Raw -Encoding UTF8 | ConvertFrom-Json
+} else {
+    $baselineCandidate = Get-ChildItem -LiteralPath $StateRoot -Filter 'tvhome-snapshot-*.json' -File -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | ForEach-Object {
+            try {
+                $candidate = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($candidate.productName -eq 'TVHome' -and $candidate.originalHomePackage -and
+                        $candidate.originalHomePackage -ne $PackageName -and
+                        $candidate.originalHomeComponent -notmatch "^$([regex]::Escape($PackageName))/") { return $candidate }
+            } catch { }
+        } | Select-Object -First 1
+    if ($baselineCandidate) { $baselineSnapshot = $baselineCandidate }
+}
+if ($baselineSnapshot) {
+    if ($baselineSnapshot.productName -ne 'TVHome' -or [int]$baselineSnapshot.userId -ne 0 -or
+            [string]$baselineSnapshot.originalHomePackage -eq $PackageName -or
+            [string]$baselineSnapshot.originalHomeComponent -notmatch '^[A-Za-z0-9._]+/[A-Za-z0-9.$_]+$' -or
+            [string]$baselineSnapshot.originalHomeComponent -match "^$([regex]::Escape($PackageName))/") {
+        throw 'The supplied original HOME snapshot is invalid or points to TVHome.'
+    }
+    if ($baselineSnapshot.deviceSerial -and $baselineSnapshot.deviceSerial -ne $actualSerial) { throw 'Original HOME snapshot belongs to a different device.' }
+    if ($baselineSnapshot.model -and $baselineSnapshot.model -ne $model) { throw 'Original HOME snapshot model does not match.' }
+    if ($baselineSnapshot.fingerprint -and $baselineSnapshot.fingerprint -ne $fingerprint) { throw 'Original HOME snapshot fingerprint does not match.' }
+    $originalHome = [string]$baselineSnapshot.originalHomeComponent
+    $originalPackage = [string]$baselineSnapshot.originalHomePackage
+    Write-Journal "ORIGINAL_BASELINE trusted snapshot=$OriginalSnapshotPath component=$originalHome"
+} else {
+    $preInstallPackage = $preInstallHome.Split('/')[0]
+    if ($preInstallPackage -eq $PackageName) { throw 'Current HOME is TVHome but no trusted original HOME snapshot was supplied.' }
+    if ($preInstallPackage -ne 'com.mitv.tvhome') { throw "Current HOME package is not the known original Xiaomi HOME: $preInstallPackage" }
+    $originalHome = $preInstallHome
+    $originalPackage = $preInstallPackage
+    Write-Journal "ORIGINAL_BASELINE live known Xiaomi HOME=$originalHome"
+}
 $originalDisabled = (Invoke-AdbText @('shell', 'pm', 'list', 'packages', '-d', '--user', '0')) -match "(?m)^package:$([regex]::Escape($originalPackage))$"
+if ($originalDisabled) { throw "Original HOME package is disabled: $originalPackage" }
 if (-not (Invoke-AdbText @('shell', 'pm', 'path', $originalPackage))) { throw "Original HOME package is not installed: $originalPackage" }
 $existingPackage = Read-OptionalPackagePath $PackageName
 $packageDump = if ($existingPackage) { Invoke-AdbText @('shell', 'dumpsys', 'package', $PackageName) } else { '' }
@@ -95,9 +176,11 @@ $snapshot = [ordered]@{
     userId = 0
     model = $model
     fingerprint = $fingerprint
+    preInstallHomeComponent = $preInstallHome
     originalHomeComponent = $originalHome
     originalHomePackage = $originalPackage
     originalHomeEnabled = (-not $originalDisabled)
+    originalBaselineSnapshot = if ($OriginalSnapshotPath) { $baselinePath } else { $null }
     tvHomeWasInstalled = [bool]$existingPackage
     tvHomePackageDump = $packageDump
     apkFileName = [IO.Path]::GetFileName($apk)
@@ -114,22 +197,31 @@ $afterOriginalDisabled = (Invoke-AdbText @('shell', 'pm', 'list', 'packages', '-
 if ($afterOriginalDisabled -ne $originalDisabled) { throw 'Original HOME enabled state changed during install.' }
 
 Invoke-AdbText @('shell', 'am', 'start', '-n', $MainActivity) | Out-Null
-$foreground = Read-Foreground
-if ($foreground -notmatch [regex]::Escape($MainActivity)) { throw 'TVHome did not become the foreground activity after install.' }
-Write-Journal 'DIRECT_START foreground verified'
+$foreground = Wait-Foreground $MainActivity
+Write-Journal "DIRECT_START foreground verified resumed=$($foreground.Resumed) currentFocus=$($foreground.CurrentFocus) focusedApp=$($foreground.FocusedApp)"
+Write-Output 'INSTALL_APK=PASS'
+Write-Output 'DIRECT_START=PASS'
+Write-Output "CURRENT_FOREGROUND=PASS resumed=$($foreground.Resumed); currentFocus=$($foreground.CurrentFocus); focusedApp=$($foreground.FocusedApp)"
+Write-Output "ORIGINAL_HOME_ENABLED=PASS package=$originalPackage"
 
 if ($ActivateHome) {
     try {
         Invoke-AdbText @('shell', 'cmd', 'package', 'set-home-activity', '--user', '0', $MainActivity) | Out-Null
-        if ((Read-HomeComponent) -ne $MainActivity) { throw 'HOME resolver did not read back TVHome.' }
+        if ((Normalize-Component (Read-HomeComponent)) -ne (Normalize-Component $MainActivity)) { throw 'HOME resolver did not read back TVHome.' }
         Invoke-AdbText @('shell', 'input', 'keyevent', '3') | Out-Null
-        if ((Read-Foreground) -notmatch [regex]::Escape($MainActivity)) { throw 'TVHome did not become foreground after HOME.' }
-        Write-Journal 'ACTIVATE_HOME resolver and foreground verified'
+        $homeForeground = Wait-Foreground $MainActivity
+        Write-Journal "ACTIVATE_HOME resolver and foreground verified resumed=$($homeForeground.Resumed) currentFocus=$($homeForeground.CurrentFocus) focusedApp=$($homeForeground.FocusedApp)"
+        Write-Output 'HOME_ACTIVATION=PASS'
+        Write-Output "CURRENT_FOREGROUND_AFTER_HOME=PASS resumed=$($homeForeground.Resumed); currentFocus=$($homeForeground.CurrentFocus); focusedApp=$($homeForeground.FocusedApp)"
     } catch {
         Write-Journal "ACTIVATE_HOME failed: $($_.Exception.Message)"
         & (Join-Path $PSScriptRoot 'Restore-OriginalHome.ps1') -Serial $Serial -AdbPath $AdbPath -SnapshotPath $snapshotPath -StateRoot $StateRoot
+        Write-Output 'HOME_ACTIVATION=FAIL_RESTORED_ORIGINAL'
         throw
     }
+} else {
+    Write-Output 'HOME_ACTIVATION=NOT_REQUESTED'
+    Write-Output '尚未更改默认 HOME'
 }
 
 Write-Journal 'END install'
