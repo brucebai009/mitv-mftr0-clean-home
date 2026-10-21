@@ -1183,6 +1183,12 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         if (grid.getPaddingTop() != target) {
             grid.setPadding(grid.getPaddingLeft(), target, grid.getPaddingRight(), grid.getPaddingBottom());
         }
+        // RecyclerView may retain a zero-offset position after Home re-entry even when padding changes.
+        // Re-anchor the first decorated row against the new padding so later rows remain below the viewport.
+        GridLayoutManager lm = (GridLayoutManager) grid.getLayoutManager();
+        if (lm != null && lm.findFirstVisibleItemPosition() <= 0) {
+            lm.scrollToPositionWithOffset(0, 0);
+        }
     }
 
     /** Refits the glass to the focused holder once the grid layout and tile dimensions settle. */
