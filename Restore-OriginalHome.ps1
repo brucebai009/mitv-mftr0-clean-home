@@ -29,10 +29,64 @@ function Read-HomeComponent {
     return $line.Trim()
 }
 
+function Normalize-Component([string]$Value) {
+    if ([string]::IsNullOrWhiteSpace($Value) -or $Value -notmatch '^([A-Za-z0-9._]+)/([A-Za-z0-9.$_]+)$') { return '' }
+    $package = $matches[1]
+    $class = $matches[2]
+    if ($class.StartsWith('.')) { $class = $package + $class }
+    elseif ($class -notmatch '\.') { $class = "$package.$class" }
+    return "$package/$class"
+}
+
+function Read-ForegroundState {
+    $activity = Invoke-AdbText @('shell', 'dumpsys', 'activity', 'activities')
+    $window = Invoke-AdbText @('shell', 'dumpsys', 'window')
+    $resumed = ''
+    foreach ($line in ($activity -split '\r?\n')) {
+        if ($line -match '(?:topResumedActivity|mResumedActivity)[:=].*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $resumed = Normalize-Component $matches[1]
+            break
+        }
+    }
+    $currentFocus = ''
+    $focusedApp = ''
+    foreach ($line in ($window -split '\r?\n')) {
+        if (-not $currentFocus -and $line -match 'mCurrentFocus=.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $currentFocus = Normalize-Component $matches[1]
+        }
+        if (-not $focusedApp -and $line -match 'mFocusedApp=.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $focusedApp = Normalize-Component $matches[1]
+        }
+    }
+    return [pscustomobject]@{ Resumed = $resumed; CurrentFocus = $currentFocus; FocusedApp = $focusedApp }
+}
+
+function Wait-Foreground([string]$ExpectedComponent, [int]$TimeoutSeconds = 10) {
+    $expected = Normalize-Component $ExpectedComponent
+    if (-not $expected) { throw "Expected foreground component is invalid: $ExpectedComponent" }
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    $last = $null
+    do {
+        $last = Read-ForegroundState
+        if ($last.Resumed -eq $expected -and $last.CurrentFocus -eq $expected -and $last.FocusedApp -eq $expected) {
+            return $last
+        }
+        Start-Sleep -Milliseconds 500
+    } while ((Get-Date) -lt $deadline)
+    throw "Foreground readback did not stabilize on $expected (resumed=$($last.Resumed); currentFocus=$($last.CurrentFocus); focusedApp=$($last.FocusedApp))."
+}
+
 if ([string]::IsNullOrWhiteSpace($Serial)) { throw 'Serial is required; no device address is built in.' }
 if (-not $SnapshotPath) {
     $candidate = Get-ChildItem -LiteralPath $StateRoot -Filter 'tvhome-snapshot-*.json' -File -ErrorAction Stop |
-        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        Sort-Object LastWriteTime -Descending | ForEach-Object {
+            try {
+                $item = Get-Content -LiteralPath $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+                if ($item.productName -eq 'TVHome' -and $item.originalHomePackage -and
+                        $item.originalHomePackage -ne 'com.gathin.tvhome' -and
+                        $item.originalHomeComponent -notmatch '^com\.gathin\.tvhome/') { return $_ }
+            } catch { }
+        } | Select-Object -First 1
     if (-not $candidate) { throw "No TVHome snapshot found under $StateRoot." }
     $SnapshotPath = $candidate.FullName
 }
@@ -42,6 +96,10 @@ if ($snapshot.productName -ne 'TVHome' -or [int]$snapshot.userId -ne 0) { throw 
 if ([string]::IsNullOrWhiteSpace($snapshot.originalHomeComponent) -or
         $snapshot.originalHomeComponent -notmatch '^[A-Za-z0-9._]+/[A-Za-z0-9.$_]+$') {
     throw 'Snapshot has no safe original HOME component.'
+}
+if ([string]$snapshot.originalHomePackage -eq 'com.gathin.tvhome' -or
+        [string]$snapshot.originalHomeComponent -match '^com\.gathin\.tvhome/') {
+    throw 'Snapshot points to TVHome and cannot be used as the original HOME baseline.'
 }
 
 New-Item -ItemType Directory -Force -Path $StateRoot | Out-Null
@@ -72,15 +130,13 @@ if ($snapshot.originalHomeEnabled -and $disabled) {
 
 Invoke-AdbText @('shell', 'cmd', 'package', 'set-home-activity', '--user', '0', $originalHome) | Out-Null
 Write-Journal "SET_HOME $originalHome"
-if ((Read-HomeComponent) -ne $originalHome) { throw 'HOME resolver did not read back the snapshot component.' }
+if ((Normalize-Component (Read-HomeComponent)) -ne (Normalize-Component $originalHome)) { throw 'HOME resolver did not read back the snapshot component.' }
 Invoke-AdbText @('shell', 'input', 'keyevent', '3') | Out-Null
-$foreground = Invoke-AdbText @('shell', 'dumpsys', 'activity', 'activities')
-if ($foreground -notmatch "(?m)(mResumedActivity|mCurrentFocus).*$([regex]::Escape($originalPackage))") {
-    throw 'Original HOME did not become the foreground application.'
-}
-Write-Journal 'READBACK resolver and foreground verified'
+$foreground = Wait-Foreground $originalHome
+Write-Journal "READBACK resolver and foreground verified resumed=$($foreground.Resumed) currentFocus=$($foreground.CurrentFocus) focusedApp=$($foreground.FocusedApp)"
 Write-Journal 'END restore'
 
 Write-Output "Original HOME restored: $originalHome"
+Write-Output "CURRENT_FOREGROUND=PASS resumed=$($foreground.Resumed); currentFocus=$($foreground.CurrentFocus); focusedApp=$($foreground.FocusedApp)"
 Write-Output "Snapshot: $snapshotFile"
 Write-Output "Journal: $JournalPath"
