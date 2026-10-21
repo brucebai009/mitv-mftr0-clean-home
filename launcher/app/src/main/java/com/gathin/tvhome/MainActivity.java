@@ -501,7 +501,9 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             open(systemIntent(Settings.ACTION_WIFI_SETTINGS));
             return true;
         });
-        btnSettings.setOnClickListener(v -> open(systemIntent(Settings.ACTION_SETTINGS)));
+        // A short tap stays inside TVHome; vendor system settings remain available from the explicit TV settings row.
+        btnSettings.setOnClickListener(v -> startActivityForResult(
+                new Intent(this, LauncherSettingsActivity.class), LAUNCHER_SETTINGS_REQUEST));
         btnReorder = findViewById(R.id.btnReorder);
         btnReorder.setOnClickListener(v -> toggleReorder());
         btnReorder.setVisibility(cfg.reorderButton ? View.VISIBLE : View.GONE);
@@ -1799,18 +1801,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
 
     // ---- top bar ---------------------------------------------------------------------------------
 
-    /** Some TVs (Coocaa OS) set the network time without ACTION_TIME_CHANGED, so keep checking until it is valid. */
+    /** The final Apple-style surface uses only the compact top-right time pill. */
     private final Runnable clockCheck = this::updateClockVisibility;
 
     private void updateClockVisibility() {
-        boolean valid = System.currentTimeMillis() >= TIME_VALID_AFTER_MS;
-        clockBlock.setVisibility(valid ? View.VISIBLE : View.INVISIBLE);
+        // Keep the legacy greeting/date block out of the final home at runtime as well as in XML.
+        clockBlock.setVisibility(View.GONE);
         handler.removeCallbacks(clockCheck);
-        if (valid) {
-            updateGreeting();
-        } else {
-            handler.postDelayed(clockCheck, 1_000L);
-        }
     }
 
     private void updateGreeting() {

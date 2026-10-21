@@ -1,3 +1,19 @@
-plugins {
-    id 'com.android.application' version '8.5.2' apply false
+buildscript {
+    def localMaven = System.getenv('MITV_LOCAL_MAVEN')
+    repositories {
+        if (localMaven && file(localMaven).isDirectory()) {
+            maven { url = uri(localMaven) }
+        }
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // Local/offline builds may point at the already audited AGP jar; CI uses the normal Maven coordinate.
+        def localAgpJar = System.getenv('MITV_LOCAL_AGP_JAR')
+        if (localAgpJar && file(localAgpJar).isFile()) {
+            classpath files(localAgpJar)
+        } else {
+            classpath 'com.android.tools.build:gradle:8.5.2'
+        }
+    }
 }

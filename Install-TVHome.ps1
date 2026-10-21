@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$Serial,
     [string]$AdbPath = 'adb',
-    [string]$ApkPath = (Join-Path $PSScriptRoot 'TVHome-MFTR0-1.0.0-rc.1.apk'),
+    [string]$ApkPath = (Join-Path $PSScriptRoot 'TVHome-MFTR0-1.0.0-v13.2.apk'),
     [string]$ManifestPath = (Join-Path $PSScriptRoot 'release-manifest.json'),
     [string]$StateRoot = (Join-Path $PSScriptRoot 'tvhome-state'),
     [string]$ExpectedModel,
@@ -13,6 +13,42 @@ param(
 $ErrorActionPreference = 'Stop'
 $PackageName = 'com.gathin.tvhome'
 $MainActivity = "$PackageName/.MainActivity"
+$TrustedCertificateSha256 = '8edb7ec47cf01743c0059740451a0dc4570b5312fe4c0e06c83595948f95d595'
+
+function Read-StrictReleaseManifest([string]$Path, [string]$Apk) {
+    try {
+        $value = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
+    } catch {
+        throw "Release manifest is not valid UTF-8 JSON: $Path ($($_.Exception.Message))"
+    }
+    if ([int]$value.schemaVersion -ne 2) { throw 'Release manifest schemaVersion must be 2.' }
+    if ([string]$value.packageName -ne $PackageName) { throw 'Manifest packageName does not match TVHome.' }
+    if ([int]$value.versionCode -le 0 -or [string]::IsNullOrWhiteSpace([string]$value.versionName)) {
+        throw 'Manifest versionCode/versionName is missing or invalid.'
+    }
+    if (-not $value.apk) { throw 'Manifest apk object is missing.' }
+    $manifestName = [string]$value.apk.fileName
+    if ([string]::IsNullOrWhiteSpace($manifestName) -or [IO.Path]::GetFileName($manifestName) -ne $manifestName -or
+            $manifestName.Contains('/') -or $manifestName.Contains('\')) {
+        throw 'Manifest apk.fileName must be a basename.'
+    }
+    if ([IO.Path]::GetFileName($Apk) -ne $manifestName) { throw 'APK filename does not match the release manifest.' }
+    $manifestHash = [string]$value.apk.sha256
+    if ($manifestHash -notmatch '^[0-9a-fA-F]{64}$') { throw 'Manifest apk.sha256 must be 64 hexadecimal characters.' }
+    if ([int64]$value.apk.sizeBytes -le 0) { throw 'Manifest apk.sizeBytes must be positive.' }
+    $certificate = [string]$value.certificateSha256
+    if ($certificate -notmatch '^[0-9a-fA-F]{64}$' -or $certificate.ToLowerInvariant() -ne $TrustedCertificateSha256) {
+        throw 'Manifest certificateSha256 is not the trusted TVHome release certificate.'
+    }
+    if ([string]$value.sourceCommit -notmatch '^[0-9a-fA-F]{40}$') { throw 'Manifest sourceCommit must be a full commit hash.' }
+    if ([int]$value.build.compileSdk -ne 34 -or [int]$value.build.targetSdk -ne 34 -or [int]$value.build.minSdk -ne 26) {
+        throw 'Manifest build SDK contract must be compileSdk=34, targetSdk=34, minSdk=26.'
+    }
+    $actualHash = (Get-FileHash -LiteralPath $Apk -Algorithm SHA256).Hash.ToLowerInvariant()
+    if ($actualHash -ne $manifestHash.ToLowerInvariant()) { throw 'APK SHA-256 does not match the release manifest.' }
+    if ((Get-Item -LiteralPath $Apk).Length -ne [int64]$value.apk.sizeBytes) { throw 'APK size does not match the release manifest.' }
+    return $value
+}
 
 function Invoke-AdbText {
     param([Parameter(Mandatory=$true)][string[]]$Arguments)
@@ -98,13 +134,8 @@ function Wait-Foreground([string]$ExpectedComponent, [int]$TimeoutSeconds = 10) 
 if ([string]::IsNullOrWhiteSpace($Serial)) { throw 'Serial is required; no device address is built in.' }
 $apk = (Resolve-Path -LiteralPath $ApkPath -ErrorAction Stop).Path
 if (-not (Test-Path -LiteralPath $ManifestPath -PathType Leaf)) { throw "Manifest not found: $ManifestPath" }
-$manifest = Get-Content -LiteralPath $ManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-if ($manifest.packageName -ne $PackageName) { throw 'Manifest packageName does not match TVHome.' }
+$manifest = Read-StrictReleaseManifest $ManifestPath $apk
 $apkHash = (Get-FileHash -LiteralPath $apk -Algorithm SHA256).Hash.ToLowerInvariant()
-$manifestApkName = [string]$manifest.apk.fileName
-$manifestApkHash = [string]$manifest.apk.sha256
-if ($manifestApkName -and ([IO.Path]::GetFileName($apk) -ne $manifestApkName)) { throw 'APK filename does not match the release manifest.' }
-if ($manifestApkHash -and ($apkHash -ne $manifestApkHash.ToLowerInvariant())) { throw 'APK SHA-256 does not match the release manifest.' }
 
 New-Item -ItemType Directory -Force -Path $StateRoot | Out-Null
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
@@ -167,6 +198,12 @@ if ($originalDisabled) { throw "Original HOME package is disabled: $originalPack
 if (-not (Invoke-AdbText @('shell', 'pm', 'path', $originalPackage))) { throw "Original HOME package is not installed: $originalPackage" }
 $existingPackage = Read-OptionalPackagePath $PackageName
 $packageDump = if ($existingPackage) { Invoke-AdbText @('shell', 'dumpsys', 'package', $PackageName) } else { '' }
+if ($packageDump -and $packageDump -match '(?m)versionCode=(\d+)') {
+    $installedVersionCode = [int]$matches[1]
+    if ($installedVersionCode -gt [int]$manifest.versionCode) {
+        throw "Refusing downgrade from installed versionCode $installedVersionCode to $($manifest.versionCode)."
+    }
+}
 
 $snapshot = [ordered]@{
     schema = 1
@@ -203,6 +240,7 @@ Write-Output 'INSTALL_APK=PASS'
 Write-Output 'DIRECT_START=PASS'
 Write-Output "CURRENT_FOREGROUND=PASS resumed=$($foreground.Resumed); currentFocus=$($foreground.CurrentFocus); focusedApp=$($foreground.FocusedApp)"
 Write-Output "ORIGINAL_HOME_ENABLED=PASS package=$originalPackage"
+Write-Output "RELEASE_MANIFEST=PASS schemaVersion=$($manifest.schemaVersion); versionCode=$($manifest.versionCode); versionName=$($manifest.versionName)"
 
 if ($ActivateHome) {
     try {

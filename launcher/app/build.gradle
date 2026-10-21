@@ -1,18 +1,18 @@
-plugins {
-    id 'com.android.application'
-}
+apply plugin: 'com.android.application'
+
+def selectedCompileSdk = (project.findProperty('compileSdkOverride') ?: '34') as Integer
 
 android {
     namespace 'com.gathin.tvhome'
-    compileSdk 34
+    compileSdk selectedCompileSdk
 
     defaultConfig {
         // Opt-in identity for firmware with a package-name HOME allowlist; see docs/devices/xiaomi-mitv-aetp0-dofus.md.
         applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
         minSdk 26
         targetSdk 34
-        versionCode 8
-        versionName '1.0.0-v13.1'
+        versionCode 9
+        versionName '1.0.0-v13.2'
     }
 
     buildTypes {

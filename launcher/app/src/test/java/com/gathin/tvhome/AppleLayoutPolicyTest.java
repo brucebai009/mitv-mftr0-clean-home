@@ -12,9 +12,9 @@ public class AppleLayoutPolicyTest {
         assertEquals(125, AppleLayoutPolicy.cardHeightDp(200));
     }
 
-    @Test public void dockIsCappedAtNinetyThreePercent() {
-        assertEquals(930, AppleLayoutPolicy.dockWidthPx(1000));
-        assertEquals(1488, AppleLayoutPolicy.dockWidthPx(1600));
+    @Test public void dockUsesTheAlreadyInsetSafeRect() {
+        assertEquals(1000, AppleLayoutPolicy.dockWidthPx(1000));
+        assertEquals(1600, AppleLayoutPolicy.dockWidthPx(1600));
     }
 
     @Test public void supportedColumnChoicesMatchSettings() {

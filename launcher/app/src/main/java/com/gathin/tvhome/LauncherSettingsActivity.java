@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +22,8 @@ import java.util.concurrent.Executors;
 
 /** Remote-friendly settings owned by the launcher; system settings stay one row away. */
 public final class LauncherSettingsActivity extends Activity {
+    private FrameLayout settingsRoot;
+    private WallpaperPlayer settingsWallpaper;
     private SharedPreferences choices;
     private final TextView[] columnChoices = new TextView[4];
     private final TextView[] rowChoices = new TextView[4];
@@ -43,8 +46,10 @@ public final class LauncherSettingsActivity extends Activity {
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_launcher_settings);
+        settingsRoot = findViewById(R.id.settingsRoot);
         choices = getSharedPreferences(Config.SETTINGS_NAME, MODE_PRIVATE);
         Config config = Config.load(this);
+        settingsWallpaper = new WallpaperPlayer(this, settingsRoot, config);
         columns = config.columns;
         rowsBelowDock = config.rowsBelowDock;
         animations = config.animations;
@@ -146,7 +151,14 @@ public final class LauncherSettingsActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (settingsWallpaper != null) settingsWallpaper.start();
         if (homeHelperChoice != null) refreshHomeHelper(homeHelperChoice);
+    }
+
+    @Override
+    protected void onPause() {
+        if (settingsWallpaper != null) settingsWallpaper.stop();
+        super.onPause();
     }
 
     private void refreshHomeHelper(TextView choice) {
@@ -358,6 +370,7 @@ public final class LauncherSettingsActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (settingsWallpaper != null) settingsWallpaper.close();
         wallpaperImporter.shutdownNow();
         super.onDestroy();
     }

@@ -1,5 +1,9 @@
 pluginManagement {
+    def localMaven = System.getenv('MITV_LOCAL_MAVEN')
     repositories {
+        if (localMaven && file(localMaven).isDirectory()) {
+            maven { url = uri(localMaven) }
+        }
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -7,7 +11,11 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    def localMaven = System.getenv('MITV_LOCAL_MAVEN')
     repositories {
+        if (localMaven && file(localMaven).isDirectory()) {
+            maven { url = uri(localMaven) }
+        }
         google()
         mavenCentral()
     }
