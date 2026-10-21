@@ -45,6 +45,8 @@ jobs:
         run: |
           set -euo pipefail
           test -f launcher/app/build/outputs/apk/release/app-release-unsigned.apk
+          # Gradle needs this local-only SDK pointer during the build; it is never a public source file.
+          rm -f launcher/local.properties
           python3 scripts/check_public_release.py --source . --apk launcher/app/build/outputs/apk/release/app-release-unsigned.apk
           sha256sum launcher/app/build/outputs/apk/release/app-release-unsigned.apk
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
