@@ -94,6 +94,15 @@
     <string name="wallpaper_none">ללא</string>
     <string name="wallpaper_applied">הטפט שונה</string>
     <string name="wallpaper_theme_default">ברירת המחדל של ערכת הנושא</string>
+    <string name="wallpaper_choose">בחירת תמונה</string>
+    <string name="wallpaper_picker_unavailable">אין בורר תמונות זמין בטלוויזיה זו</string>
+    <string name="wallpaper_imported">התמונה יובאה</string>
+    <string name="wallpaper_import_failed">לא ניתן לייבא את התמונה</string>
+    <string name="wallpaper_dim_label">עמעום הרקע</string>
+    <string name="wallpaper_dim_state">עמעום הרקע: %1$d%%</string>
+    <string name="wallpaper_dim_percent">%1$d%%</string>
+    <string name="home_only_helper_name">מסייע כפתור הבית של TVHome</string>
+    <string name="home_only_helper_description">מטפל רק בכפתור הבית הפיזי עבור TVHome. אינו קורא את המסך ואינו שולט בכפתורים אחרים.</string>
 
     <!-- Race-weekend panel (RaceWeekend). -->
     <string name="race_kicker">סבב %1$d · %2$s · %3$s</string>
