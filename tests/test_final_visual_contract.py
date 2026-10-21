@@ -52,3 +52,12 @@ def test_cold_start_parks_dock_before_refitting_glass():
     assert layout_listener.index("grid.post(this::parkDockOnlyRow);") < layout_listener.index(
         "grid.post(this::refitGlass);"
     )
+
+
+def test_refit_glass_reacts_to_position_changes_not_only_size():
+    text = MAIN.read_text(encoding="utf-8")
+    start = text.index("private void refitGlass()")
+    end = text.index("// ---- top shelf", start)
+    refit = text[start:end]
+    assert "Math.abs(glassTargetX - targetX)" in refit
+    assert "Math.abs(glassTargetY - targetY)" in refit

@@ -1201,7 +1201,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         float scale = adapter.focusScale();
         int w = (int) (card.getWidth() * scale + 2 * pad);
         int h = (int) (card.getHeight() * scale + 2 * pad);
-        if (!glassShown || card.getWidth() != glassCardW || glass.getWidth() != w || glass.getHeight() != h) {
+        Rect r = tileRect;
+        r.set(0, 0, card.getWidth(), card.getHeight());
+        root.offsetDescendantRectToMyCoords(card, r);
+        float targetX = r.exactCenterX() - w / 2f;
+        float targetY = r.exactCenterY() - h / 2f - (advancedEffects ? 4f * density : 0f);
+        boolean positionChanged = Math.abs(glassTargetX - targetX) > 1f
+                || Math.abs(glassTargetY - targetY) > 1f;
+        if (!glassShown || card.getWidth() != glassCardW || glass.getWidth() != w || glass.getHeight() != h
+                || positionChanged) {
             onTileFocused(pos, card);
         }
     }
