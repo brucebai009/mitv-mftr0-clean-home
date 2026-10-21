@@ -72,6 +72,11 @@ jobs:
               safe=${line:0:900}
               echo "::warning title=Gradle tail::$safe"
             done
+            grep -i -E 'error|warning|issue|lint|invalid|deprecated|permission|manifest|resource' build-output.log | tail -n 80 | while IFS= read -r line; do
+              [ -n "$line" ] || continue
+              safe=${line:0:900}
+              echo "::warning title=Gradle diagnostic::$safe"
+            done
           fi
           report='launcher/app/build/reports/lint-results-release.xml'
           if [ -f "$report" ]; then
