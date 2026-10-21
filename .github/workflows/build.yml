@@ -67,6 +67,11 @@ jobs:
               safe=${line:0:900}
               echo "::error title=Gradle failure::$safe"
             done
+            tail -n 60 build-output.log | while IFS= read -r line; do
+              [ -n "$line" ] || continue
+              safe=${line:0:900}
+              echo "::warning title=Gradle tail::$safe"
+            done
           fi
           report='launcher/app/build/reports/lint-results-release.xml'
           if [ -f "$report" ]; then
