@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "packageName": "com.gathin.tvhome",
+  "versionCode": 9,
+  "versionName": "1.0.0-v13.2",
+  "apk": {
+    "fileName": "TVHome-MFTR0-1.0.0-v13.2.apk",
+    "sha256": "A62B4DC00FB6787140312CE546263643DEB82AFFA23D573600E839203AAE5F74",
+    "sizeBytes": 442091
+  },
+  "certificateSha256": "8edb7ec47cf01743c0059740451a0dc4570b5312fe4c0e06c83595948f95d595",
+  "sourceCommit": "16edcd5ef30e3a462441c211cc84a2128ea924b2",
+  "build": {
+    "tool": "GitHub Actions",
+    "workflow": "Build TVHome",
+    "compileSdk": 34,
+    "targetSdk": 34,
+    "minSdk": 26,
+    "gradle": "8.9",
+    "agp": "8.5.2"
+  },
+  "acceptance": {
+    "sdk34Build": "PASS",
+    "unitTests": "PASS",
+    "lintRelease": "PASS",
+    "publicPrivacyScan": "PASS",
+    "deviceInstall": "PASS",
+    "staticRainWallpaper": "PASS",
+    "dynamicRainCity": "BLOCKED",
+    "originalHomePreserved": "PASS",
+    "contentPolicyAudit": "PASS"
+  }
+}
