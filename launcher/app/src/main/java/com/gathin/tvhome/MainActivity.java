@@ -1195,7 +1195,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         // Re-anchor the first decorated row against the new padding so later rows remain below the viewport.
         GridLayoutManager lm = (GridLayoutManager) grid.getLayoutManager();
         if (lm != null && lm.findFirstVisibleItemPosition() <= 0) {
-            lm.scrollToPositionWithOffset(0, 0);
+            lm.scrollToPositionWithOffset(0, target);
         }
     }
 
