@@ -22,6 +22,13 @@ public class ThemeFilesTest {
         assertEquals("wallpapers/Night_2.WEBP", ThemeFiles.path(Arrays.asList("wallpapers", "Night_2.WEBP")));
     }
 
+    @Test public void collectionVideosAreAllowedWithoutWideningImagePaths() {
+        assertEquals("videos/loop-01.mp4", ThemeFiles.path(Arrays.asList("videos", "loop-01.mp4")));
+        assertTrue(ThemeFiles.collectionVideo("loop-01.mp4"));
+        assertFalse(ThemeFiles.collectionVideo("loop-01.mkv"));
+        assertNull(ThemeFiles.path(Arrays.asList("videos", "loop-01.sh")));
+    }
+
     @Test public void anythingElseIsRefused() {
         assertNull(ThemeFiles.path(null));
         assertNull(ThemeFiles.path(Collections.emptyList()));
@@ -39,6 +46,7 @@ public class ThemeFilesTest {
 
     @Test public void onlyTheBareFolderIsTheCollection() {
         assertTrue(ThemeFiles.isCollection(Collections.singletonList("wallpapers")));
+        assertTrue(ThemeFiles.isCollection(Collections.singletonList("videos")));
         assertFalse(ThemeFiles.isCollection(Arrays.asList("wallpapers", "dusk.jpg")));
         assertFalse(ThemeFiles.isCollection(Collections.singletonList("config.json")));
     }

@@ -26,15 +26,18 @@ public final class LauncherSettingsActivity extends Activity {
     private final TextView[] rowChoices = new TextView[4];
     private TextView wallpaperChoice;
     private TextView wallpaperDimChoice;
+    private TextView videoWallpaperChoice;
     private TextView animationsChoice;
     private TextView advancedChoice;
     private TextView followThemeChoice;
+    private TextView homeHelperChoice;
     private int columns;
     private int rowsBelowDock;
     private boolean animations;
     private boolean advancedEffects;
     private final ExecutorService wallpaperImporter = Executors.newSingleThreadExecutor();
     private static final int REQUEST_WALLPAPER = 1101;
+    private static final int REQUEST_VIDEO_WALLPAPER = 1102;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -81,6 +84,8 @@ public final class LauncherSettingsActivity extends Activity {
         wallpaperChoice.setOnClickListener(v -> showWallpaperPicker());
         wallpaperDimChoice = findViewById(R.id.wallpaperDimChoice);
         wallpaperDimChoice.setOnClickListener(v -> showWallpaperDimPicker());
+        videoWallpaperChoice = findViewById(R.id.videoWallpaperChoice);
+        videoWallpaperChoice.setOnClickListener(v -> showVideoWallpaperPicker());
         animationsChoice = findViewById(R.id.animationsChoice);
         animationsChoice.setOnClickListener(v -> {
             animations = !animations;
@@ -108,7 +113,8 @@ public final class LauncherSettingsActivity extends Activity {
             if (!hasOnTvChoices()) return;
             choices.edit().remove("columns").remove(Config.ROWS_BELOW_DOCK_KEY).remove("animations")
                     .remove("advanced_effects").remove(Config.WALLPAPER_CHOICE_KEY)
-                    .remove(Config.WALLPAPER_DIM_KEY).commit();
+                    .remove(Config.WALLPAPER_DIM_KEY).remove("background_mode")
+                    .remove("video_wallpaper_path").commit();
             Config current = Config.load(this);
             columns = current.columns;
             rowsBelowDock = current.rowsBelowDock;
@@ -121,13 +127,26 @@ public final class LauncherSettingsActivity extends Activity {
             Toast.makeText(this, R.string.home_settings_help, Toast.LENGTH_LONG).show();
             open(new Intent(Settings.ACTION_HOME_SETTINGS));
         });
-        TextView homeHelperChoice = findViewById(R.id.homeHelperChoice);
+        homeHelperChoice = findViewById(R.id.homeHelperChoice);
         homeHelperChoice.setOnClickListener(v -> open(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
         refreshHomeHelper(homeHelperChoice);
+        findViewById(R.id.homeSignalSourceChoice).setOnClickListener(v ->
+                open(new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_OPEN_INPUTS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
+        findViewById(R.id.homeScreensaverChoice).setOnClickListener(v ->
+                open(new Intent(Settings.ACTION_DREAM_SETTINGS)));
+        findViewById(R.id.homeAppsChoice).setOnClickListener(v ->
+                open(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)));
         findViewById(R.id.tvSettingsChoice).setOnClickListener(v ->
                 open(new Intent(Settings.ACTION_SETTINGS)));
         refresh();
         columnChoices[Math.max(0, Math.min(columns - 4, 3))].requestFocus();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (homeHelperChoice != null) refreshHomeHelper(homeHelperChoice);
     }
 
     private void refreshHomeHelper(TextView choice) {
@@ -163,17 +182,19 @@ public final class LauncherSettingsActivity extends Activity {
                 .setSingleChoiceItems(labels, checked, (dialog, which) -> {
                     dialog.dismiss();
                     if (which == images.size()) {
-                        choices.edit().putString(Config.WALLPAPER_CHOICE_KEY, "none").apply();
+                        choices.edit().putString(Config.WALLPAPER_CHOICE_KEY, "none")
+                                .putString("background_mode", "image").apply();
                     } else {
                         choices.edit().putString(Config.WALLPAPER_CHOICE_KEY,
-                                images.get(which).getName()).apply();
+                                images.get(which).getName()).putString("background_mode", "image").apply();
                     }
                     setResult(RESULT_OK);
                     Toast.makeText(this, R.string.wallpaper_applied, Toast.LENGTH_SHORT).show();
                     refresh();
                 })
                 .setNeutralButton(R.string.wallpaper_theme_default, (dialog, which) -> {
-                    choices.edit().remove(Config.WALLPAPER_CHOICE_KEY).apply();
+                    choices.edit().remove(Config.WALLPAPER_CHOICE_KEY)
+                            .putString("background_mode", "image").apply();
                     setResult(RESULT_OK);
                     refresh();
                 })
@@ -208,6 +229,36 @@ public final class LauncherSettingsActivity extends Activity {
                     setResult(RESULT_OK);
                     dialog.dismiss();
                     refresh();
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void openVideoDocument() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("video/mp4")
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try {
+            startActivityForResult(intent, REQUEST_VIDEO_WALLPAPER);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.wallpaper_picker_unavailable, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showVideoWallpaperPicker() {
+        String[] options = {getString(R.string.video_wallpaper_choose), getString(R.string.video_wallpaper_none)};
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.video_wallpaper_label)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        openVideoDocument();
+                    } else {
+                        choices.edit().putString("background_mode", "image")
+                                .remove("video_wallpaper_path").apply();
+                        setResult(RESULT_OK);
+                        refresh();
+                    }
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
@@ -249,6 +300,9 @@ public final class LauncherSettingsActivity extends Activity {
         int dim = WallpaperImport.normalizeDim(choices.getInt(
                 Config.WALLPAPER_DIM_KEY, Config.DEFAULT_WALLPAPER_DIM));
         wallpaperDimChoice.setText(getString(R.string.wallpaper_dim_state, dim));
+        String videoPath = choices.getString("video_wallpaper_path", "");
+        videoWallpaperChoice.setText(getString(R.string.video_wallpaper_state,
+                videoPath.isEmpty() ? getString(R.string.video_wallpaper_none) : new File(videoPath).getName()));
         followThemeChoice.setSelected(!hasOnTvChoices());
     }
 
@@ -256,12 +310,33 @@ public final class LauncherSettingsActivity extends Activity {
         return choices.contains("columns") || choices.contains(Config.ROWS_BELOW_DOCK_KEY)
                 || choices.contains("animations") || choices.contains("advanced_effects")
                 || choices.contains(Config.WALLPAPER_CHOICE_KEY)
-                || choices.contains(Config.WALLPAPER_DIM_KEY);
+                || choices.contains(Config.WALLPAPER_DIM_KEY)
+                || choices.contains("video_wallpaper_path");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_VIDEO_WALLPAPER) {
+            if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
+            Uri uri = data.getData();
+            wallpaperImporter.execute(() -> {
+                try {
+                    File imported = VideoWallpaperImport.importVideo(this, uri);
+                    runOnUiThread(() -> {
+                        choices.edit().putString("background_mode", "video")
+                                .putString("video_wallpaper_path", imported.getAbsolutePath()).apply();
+                        setResult(RESULT_OK);
+                        Toast.makeText(this, R.string.video_wallpaper_imported, Toast.LENGTH_SHORT).show();
+                        refresh();
+                    });
+                } catch (IOException | RuntimeException failure) {
+                    runOnUiThread(() -> Toast.makeText(this, R.string.video_wallpaper_import_failed,
+                            Toast.LENGTH_LONG).show());
+                }
+            });
+            return;
+        }
         if (requestCode != REQUEST_WALLPAPER || resultCode != RESULT_OK || data == null) return;
         Uri uri = data.getData();
         if (uri == null) return;

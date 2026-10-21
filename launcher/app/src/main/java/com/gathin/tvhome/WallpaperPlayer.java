@@ -8,6 +8,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.TextureView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
@@ -29,6 +30,9 @@ final class WallpaperPlayer {
     private final Random random = new Random();
     private final int width;
     private final int height;
+    private final SharedPreferences settings;
+    private final VideoWallpaperPlayer videoPlayer;
+    private final boolean videoMode;
     private boolean active;
     private boolean closed;
     private boolean loading;
@@ -39,24 +43,29 @@ final class WallpaperPlayer {
         files = new ArrayList<>(config.wallpapers);
         interval = config.wallpaperRotationMinutes * 60_000L;
         preferences = context.getSharedPreferences("wallpaper_rotation", Context.MODE_PRIVATE);
+        settings = context.getSharedPreferences(Config.SETTINGS_NAME, Context.MODE_PRIVATE);
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         width = metrics.widthPixels;
         height = metrics.heightPixels;
         image = new ImageView(context);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         image.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        if (config.wallpaperEnabled && !files.isEmpty()) {
+        boolean imageMode = config.wallpaperEnabled && !files.isEmpty();
+        if (imageMode) {
             root.addView(image, 0, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            // No shade layer at all when the theme doesn't dim: a full-screen view is overdraw on 1 GB TVs.
-            if (config.wallpaperDim > 0) {
-                View shade = new View(context);
-                shade.setBackgroundColor((config.wallpaperDim * 255 / 100) << 24);
-                shade.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-                root.addView(shade, 1, new FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            }
             showFirst();
+        }
+        File video = selectedVideo(context);
+        videoMode = video != null;
+        videoPlayer = videoMode ? addVideo(context, root, video) : null;
+        // No shade layer at all when the theme doesn't dim: a full-screen view is overdraw on 1 GB TVs.
+        if (config.wallpaperDim > 0 && (imageMode || videoMode)) {
+            View shade = new View(context);
+            shade.setBackgroundColor((config.wallpaperDim * 255 / 100) << 24);
+            shade.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            root.addView(shade, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
     }
 
@@ -87,21 +96,24 @@ final class WallpaperPlayer {
 
     void start() {
         active = true;
+        if (videoPlayer != null) videoPlayer.start();
         update();
     }
 
     void stop() {
         active = false;
+        if (videoPlayer != null) videoPlayer.stop();
     }
 
     void close() {
         active = false;
         closed = true;
+        if (videoPlayer != null) videoPlayer.close();
         decoder.shutdownNow();
     }
 
     void update() {
-        if (!active || closed || loading || files.isEmpty()) return;
+        if (videoMode || !active || closed || loading || files.isEmpty()) return;
         String previous = preferences.getString("image", "");
         File selected = WallpaperRotation.find(files, previous);
         long changed = preferences.getLong("changed", 0);
@@ -157,5 +169,21 @@ final class WallpaperPlayer {
         } catch (Exception | OutOfMemoryError failure) {
             return null;
         }
+    }
+
+    private File selectedVideo(Context context) {
+        if (!"video".equals(settings.getString("background_mode", "image"))) return null;
+        String path = settings.getString("video_wallpaper_path", "");
+        if (path == null || path.isEmpty()) return null;
+        File file = new File(path);
+        return file.isFile() && VideoWallpaperPolicy.safeSourceName(file.getName()) ? file : null;
+    }
+
+    private VideoWallpaperPlayer addVideo(Context context, FrameLayout root, File file) {
+        TextureView texture = new TextureView(context);
+        texture.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+        root.addView(texture, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        return new VideoWallpaperPlayer(context, texture, file, () -> texture.setVisibility(View.GONE));
     }
 }

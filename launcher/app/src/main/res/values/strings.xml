@@ -44,6 +44,13 @@
     <string name="wallpaper_dim_label">Background dim</string>
     <string name="wallpaper_dim_state">Background dim: %1$d%%</string>
     <string name="wallpaper_dim_percent">%1$d%%</string>
+    <string name="video_wallpaper_label" translatable="false">动态视频背景</string>
+    <string name="video_wallpaper_state" translatable="false">动态视频背景：%1$s</string>
+    <string name="video_wallpaper_none" translatable="false">未启用</string>
+    <string name="video_wallpaper_choose" translatable="false">选择本地MP4视频</string>
+    <string name="video_wallpaper_imported" translatable="false">视频背景已导入</string>
+    <string name="video_wallpaper_import_failed" translatable="false">视频不符合限制，已保留原背景</string>
+    <string name="video_wallpaper_hint" translatable="false">建议使用10–30秒、1080p以内的循环视频。背景始终静音。</string>
     <string name="animations_state">Animations: %1$s</string>
     <string name="advanced_effects">Advanced effects</string>
     <string name="advanced_effects_state">Advanced effects: %1$s</string>
@@ -68,6 +75,11 @@
     <string name="home_helper_open_settings" translatable="false">打开电视辅助功能设置</string>
     <string name="home_normal_behavior" translatable="false">单按Home回到TVHome，快速连按三次进入小米原厂桌面。</string>
     <string name="home_unsupported" translatable="false">此电视暂未允许接管Home。你仍可从原厂应用列表打开TVHome。</string>
+    <string name="home_signal_source" translatable="false">信号源与预览</string>
+    <string name="home_signal_source_hint" translatable="false">在桌面内打开已验证的信号源入口；若电视不支持预览，将回退到小米界面查看信号源。</string>
+    <string name="home_screensaver" translatable="false">屏保与闲置</string>
+    <string name="home_screensaver_hint" translatable="false">仅在桌面闲置时显示，不影响其它应用和HDMI播放。</string>
+    <string name="home_apps_category" translatable="false">应用与Dock</string>
     <string name="card_prompt_title">New card from %1$s</string>
     <string name="card_prompt_body">%1$s can show a card on your home screen. Keeping it hidden leaves the app\'s normal tile as it is.</string>
     <string name="card_prompt_names">The card is named \'%1$s\'. The app is \'%2$s\'.</string>

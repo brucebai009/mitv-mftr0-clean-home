@@ -22,10 +22,12 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
     DockDecoration(int dockSize, float density, boolean translucent) {
         this.dockSize = dockSize;
         this.density = density;
-        band.setColor(translucent ? 0x8C121014 : 0xFF141416);
+        // The dock is a light material surface, not an opaque bar; the existing wallpaper remains visible
+        // through it and GlassView still supplies the focused-card sheen.
+        band.setColor(translucent ? 0x8C121014 : 0xB314161A);
         edge.setStyle(Paint.Style.STROKE);
         edge.setStrokeWidth(density);
-        edge.setColor(translucent ? 0x26FFFFFF : 0x1FFFFFFF);
+        edge.setColor(translucent ? 0x26FFFFFF : 0x40FFFFFF);
     }
 
     @Override
@@ -60,6 +62,12 @@ public class DockDecoration extends RecyclerView.ItemDecoration {
             }
         }
         if (!any) return;
+        float maxWidth = AppleLayoutPolicy.dockWidthPx(parent.getWidth());
+        if (maxWidth > 0 && rect.width() > maxWidth) {
+            float center = parent.getWidth() * 0.5f;
+            rect.left = center - maxWidth * 0.5f;
+            rect.right = center + maxWidth * 0.5f;
+        }
         float pad = 14 * density;
         // The band can only draw inside the grid, and the first and last dock tiles sit 12dp in from its
         // edges: a full 14dp at the sides sliced the rounded ends flat (#454). Keep the sides, with the

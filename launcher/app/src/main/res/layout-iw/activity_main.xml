@@ -310,6 +310,20 @@
                 android:clipToPadding="false"
                 android:orientation="horizontal">
 
+                <TextClock
+                    android:id="@+id/appleTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="center"
+                    android:format12Hour="h:mm a"
+                    android:format24Hour="HH:mm"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/outfit_medium"
+                    android:letterSpacing="0.03"
+                    android:importantForAccessibility="no" />
+
                 <TextView
                     android:id="@+id/btnSettings"
                     style="@style/TopButton"

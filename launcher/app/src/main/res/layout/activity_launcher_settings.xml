@@ -72,6 +72,19 @@
             android:layout_marginTop="10dp" />
 
         <TextView
+            android:id="@+id/videoWallpaperChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="@string/video_wallpaper_hint"
+            android:textColor="#FFACB8C1"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/animationsChoice"
             style="@style/SettingsRow"
             android:layout_marginTop="28dp" />
@@ -121,6 +134,30 @@
             android:id="@+id/homeHelperChoice"
             style="@style/SettingsRow"
             android:layout_marginTop="18dp" />
+
+        <TextView
+            android:id="@+id/homeNormalBehavior"
+            style="@style/SettingsRow"
+            android:layout_marginTop="10dp"
+            android:text="@string/home_normal_behavior" />
+
+        <TextView
+            android:id="@+id/homeSignalSourceChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="28dp"
+            android:text="@string/home_signal_source" />
+
+        <TextView
+            android:id="@+id/homeScreensaverChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="10dp"
+            android:text="@string/home_screensaver" />
+
+        <TextView
+            android:id="@+id/homeAppsChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="10dp"
+            android:text="@string/home_apps_category" />
 
         <TextView
             android:id="@+id/tvSettingsChoice"

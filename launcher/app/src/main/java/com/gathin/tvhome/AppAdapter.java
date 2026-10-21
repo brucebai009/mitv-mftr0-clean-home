@@ -91,7 +91,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     static final float FOCUS_SCALE = 1.10f;
     /** Design size of a tile (dp); tiles shrink from here when the columns don't fit, see tileWidthPx. */
-    static final float DESIGN_W_DP = 180f, DESIGN_H_DP = 101f;
+    /** V13.1 material cards use the task's 16:10 ratio while preserving the old sizing API. */
+    static final float DESIGN_W_DP = 180f, DESIGN_H_DP = 112.5f;
 
     /**
      * Tile width for a grid of this inner width: the cell minus room for the focus zoom and the glass
@@ -124,7 +125,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
      * row. The plain grid fits more rows on the screen, and with item_app.xml's roomier spacing the tiles came
      * out small with wide gaps between them.
      */
-    static final float COMPACT_ITEM_EXTRA_DP = 4 + 4 + 4 + 20;
+    static final float COMPACT_ITEM_EXTRA_DP = 2 + 2 + 2 + 18;
     static final float COMPACT_BOTTOM_ROOM_DP = 16;
 
     /** item_app.xml: 8dp padding above and below, a 7dp gap and the 22dp name label under the tile. */
@@ -133,8 +134,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static final float DOCK_EXTRA_DP = 6 + 12;
     /** Room kept under the last row rows_below_dock asks for (MainActivity places the dock with the same). */
     static final float BOTTOM_ROOM_DP = 30;
-    /** Room kept above the dock for the dock title (48sp hero name plus its 40dp gap) when dock_title is on. */
-    static final float TITLE_ROOM_DP = 104;
+    /** Room kept above the dock for the dock title (48sp name plus its compact gap) when dock_title is on. */
+    static final float TITLE_ROOM_DP = 95;
     /** dock_row false: room above the first row for its zoom and glass (MainActivity places the grid with it). */
     static final float TOP_ROOM_DP = 12;
 
@@ -384,9 +385,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         nameLp.width = w;
         nameLp.topMargin = h + Math.round((dockRow ? 7 : 4) * density);
         if (!dockRow) {
-            // Compact spacing (COMPACT_ITEM_EXTRA_DP): 4dp item padding and a 20dp name instead of 8dp and 22dp.
-            nameLp.height = Math.round(20 * density);
-            int pad = Math.round(4 * density);
+            // Compact spacing (COMPACT_ITEM_EXTRA_DP): 2dp item padding and an 18dp name instead of 8dp and 22dp.
+            nameLp.height = Math.round(18 * density);
+            int pad = Math.round(2 * density);
+            nameLp.topMargin = h + Math.round(2 * density);
             v.setPadding(v.getPaddingLeft(), pad, v.getPaddingRight(), pad);
         }
         name.setLayoutParams(nameLp);

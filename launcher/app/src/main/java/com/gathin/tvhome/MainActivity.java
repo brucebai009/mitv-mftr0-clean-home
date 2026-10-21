@@ -91,6 +91,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private static final int LAUNCHER_SETTINGS_REQUEST = 42;
     /** Sent by QuickSettingsActivity: open Launcher settings from here so Home rebuilds when they close. */
     static final String ACTION_LAUNCHER_SETTINGS = "com.gathin.tvhome.action.LAUNCHER_SETTINGS";
+    static final String ACTION_OPEN_INPUTS = "com.gathin.tvhome.action.OPEN_INPUTS";
     /** Tiles per row and dock slots (res/values/config.xml, columns). Set in onCreate. */
     static int COLUMNS = 4;
     private boolean rtlAppGrid;
@@ -562,7 +563,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                     .build(), vpnCallback);
         }
         // Not after recreate(): the launch intent survives it and would open the settings again.
-        if (savedInstanceState == null) openLauncherSettingsIfAsked(getIntent());
+        if (savedInstanceState == null) {
+            if (openLauncherSettingsIfAsked(getIntent())) return;
+            if (ACTION_OPEN_INPUTS.equals(getIntent().getAction())) {
+                setIntent(new Intent(Intent.ACTION_MAIN));
+                handler.post(this::showInputs);
+            }
+        }
     }
 
     private boolean openLauncherSettingsIfAsked(Intent intent) {
@@ -581,6 +588,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (openLauncherSettingsIfAsked(intent)) return;
+        if (intent != null && ACTION_OPEN_INPUTS.equals(intent.getAction())) {
+            setIntent(new Intent(Intent.ACTION_MAIN));
+            handler.post(this::showInputs);
+            return;
+        }
         if (intent == null || !intent.hasCategory(Intent.CATEGORY_HOME)) return;
         grid.scrollToPosition(0);
         lastFocused = 0;

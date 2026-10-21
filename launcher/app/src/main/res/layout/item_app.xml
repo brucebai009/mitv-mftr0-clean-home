@@ -10,7 +10,7 @@
     <FrameLayout
         android:id="@+id/card"
         android:layout_width="180dp"
-        android:layout_height="101dp"
+        android:layout_height="113dp"
         android:layout_gravity="center_horizontal|top"
         android:background="@drawable/tile_bg"
         android:focusable="true"
