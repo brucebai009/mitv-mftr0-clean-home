@@ -27,7 +27,7 @@ PRIVATE_IP_PATTERNS = (
     re.compile(r"(?<![0-9.])172\.(?:1[6-9]|2[0-9]|3[01])\.(?:[0-9]{1,3}\.)[0-9]{1,3}(?![0-9.])"),
 )
 WINDOWS_USER_PATH = re.compile(r"[A-Z]:" + r"\\Users" + r"\\[^\s\\/]+", re.IGNORECASE)
-FORBIDDEN_WORDS = ("WON" + "JEAN", "WAR" + "LIN", "BRUCE")
+FORBIDDEN_WORDS = ("WON" + "JEAN", "WAR" + "LIN", "BRU" + "CE")
 SECRET_SUFFIXES = {".jks", ".keystore", ".p12", ".pfx", "local.properties"}
 
 
