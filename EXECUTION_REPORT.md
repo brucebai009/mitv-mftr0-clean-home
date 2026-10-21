@@ -6,6 +6,7 @@ Date: 2026-10-21 (Asia/Hong_Kong)
 
 - Repository root: `E:\MiTV-CleanYourTV\repo`
 - Local branch: `bruce/mitv-clean-home-v1`
+- Implementation commit: `2b2d751` (`Add exact Xiaomi TV profile and preserve native preview`).
 - Upstream archive: fixed commit `d27bb0604c75b9b144fb278e6e5d0671074b25f9`
 - Product version: `2.4-bruce.1`, versionCode `6`.
 - The implementation is an additive exact-device profile. It does not change the upstream package identity, uninstall applications, clear application data, disable the factory launcher, or write system partitions.
@@ -14,6 +15,7 @@ Date: 2026-10-21 (Asia/Hong_Kong)
 
 - Static profile tests: `python -m pytest tests/test_mitv_profile.py -q` — PASS, 3 passed.
 - Gradle/plugin task discovery with the fixed AGP/Gradle versions — PASS using the local toolchain mirror init script.
+- Gradle task graph — PASS; `assembleRelease`, `lintRelease` and `testReleaseUnitTest` are available.
 - Required release/unit-test build — BLOCKED locally because `E:\Android\Sdk` has no `platforms;android-34` or `build-tools;34.0.0`. An offline Gradle attempt failed deterministically with `Failed to find target with hash string 'android-34'`; no substitute API was copied or renamed.
 - No install was performed before a conforming API 34 build existed.
 
