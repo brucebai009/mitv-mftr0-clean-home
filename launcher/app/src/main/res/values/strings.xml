@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Home</string>
+    <string name="app_name">TVHome</string>
     <string name="inputs">Inputs</string>
     <string name="wifi">Wi-Fi</string>
     <string name="settings">Settings</string>
@@ -37,6 +37,13 @@
     <string name="wallpaper_none">None</string>
     <string name="wallpaper_applied">Wallpaper changed</string>
     <string name="wallpaper_theme_default">Theme default</string>
+    <string name="wallpaper_choose">Choose picture</string>
+    <string name="wallpaper_picker_unavailable">No picture picker is available on this TV</string>
+    <string name="wallpaper_imported">Picture imported</string>
+    <string name="wallpaper_import_failed">Could not import that picture</string>
+    <string name="wallpaper_dim_label">Background dim</string>
+    <string name="wallpaper_dim_state">Background dim: %1$d%%</string>
+    <string name="wallpaper_dim_percent">%1$d%%</string>
     <string name="animations_state">Animations: %1$s</string>
     <string name="advanced_effects">Advanced effects</string>
     <string name="advanced_effects_state">Advanced effects: %1$s</string>

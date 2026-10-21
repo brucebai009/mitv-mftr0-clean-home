@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">主屏幕</string>
+    <string name="app_name">TVHome</string>
+    <string name="wallpaper_label">背景图</string>
+    <string name="wallpaper_state">背景图：%1$s</string>
+    <string name="wallpaper_none">无背景图</string>
+    <string name="wallpaper_applied">背景图已更换</string>
+    <string name="wallpaper_theme_default">恢复默认背景</string>
+    <string name="wallpaper_choose">选择图片</string>
+    <string name="wallpaper_picker_unavailable">此电视暂无可用的图片选择器</string>
+    <string name="wallpaper_imported">已导入图片</string>
+    <string name="wallpaper_import_failed">暂时无法导入这张图片</string>
+    <string name="wallpaper_dim_label">背景压暗</string>
+    <string name="wallpaper_dim_state">背景压暗：%1$d%%</string>
+    <string name="wallpaper_dim_percent">%1$d%%</string>
     <string name="inputs">输入源</string>
     <string name="wifi">无线网络</string>
     <string name="settings">设置</string>

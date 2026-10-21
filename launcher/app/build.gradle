@@ -11,8 +11,8 @@ android {
         applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
         minSdk 26
         targetSdk 34
-        versionCode 6
-        versionName '2.4-bruce.1'
+        versionCode 7
+        versionName '1.0.0-rc.1'
     }
 
     buildTypes {
@@ -21,8 +21,8 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Sideloaded over ADB, never published: sign with the debug key so it installs over a debug build.
-            signingConfig signingConfigs.debug
+            // Release artifacts are deliberately unsigned here; the release key stays outside source and CI.
+            signingConfig = null
         }
     }
 

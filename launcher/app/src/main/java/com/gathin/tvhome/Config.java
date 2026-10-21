@@ -36,6 +36,8 @@ final class Config {
     static final String SETTINGS_NAME = "launcher_settings";
     static final String ROWS_BELOW_DOCK_KEY = "rows_below_dock";
     static final String WALLPAPER_CHOICE_KEY = "wallpaper_choice";
+    static final String WALLPAPER_DIM_KEY = "wallpaper_dim";
+    static final int DEFAULT_WALLPAPER_DIM = 30;
     private static final String THEME_REVISION_NAME = "theme_revision";
     private static final String THEME_SIGNATURE_KEY = "theme_signature";
 
@@ -255,7 +257,9 @@ final class Config {
         boolean wallpaperEnabled = json == null || bool(json, "wallpaper", true);
         if (!wallpaperEnabled) wallpaper = null;
         int rotationMinutes = json == null ? 0 : integer(json, "wallpaper_rotation_minutes", 0, 0, 1440);
-        int wallpaperDim = json == null ? 0 : integer(json, "wallpaper_dim", 0, 0, 90);
+        int wallpaperDim = json == null ? DEFAULT_WALLPAPER_DIM
+                : integer(json, "wallpaper_dim", DEFAULT_WALLPAPER_DIM, 0, 70);
+        wallpaperDim = WallpaperImport.normalizeDim(choices.getInt(WALLPAPER_DIM_KEY, wallpaperDim));
         List<File> wallpapers = new ArrayList<>();
         if (rotationMinutes > 0 && dir != null && wallpaperEnabled) {
             wallpapers.addAll(WallpaperRotation.images(new File(dir, "wallpapers")));

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.LinearLayout;
@@ -13,6 +14,8 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /** Remote-friendly settings owned by the launcher; system settings stay one row away. */
 public final class LauncherSettingsActivity extends Activity {
@@ -20,6 +23,7 @@ public final class LauncherSettingsActivity extends Activity {
     private final TextView[] columnChoices = new TextView[4];
     private final TextView[] rowChoices = new TextView[4];
     private TextView wallpaperChoice;
+    private TextView wallpaperDimChoice;
     private TextView animationsChoice;
     private TextView advancedChoice;
     private TextView followThemeChoice;
@@ -27,6 +31,8 @@ public final class LauncherSettingsActivity extends Activity {
     private int rowsBelowDock;
     private boolean animations;
     private boolean advancedEffects;
+    private final ExecutorService wallpaperImporter = Executors.newSingleThreadExecutor();
+    private static final int REQUEST_WALLPAPER = 1101;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -71,6 +77,8 @@ public final class LauncherSettingsActivity extends Activity {
         }
         wallpaperChoice = findViewById(R.id.wallpaperChoice);
         wallpaperChoice.setOnClickListener(v -> showWallpaperPicker());
+        wallpaperDimChoice = findViewById(R.id.wallpaperDimChoice);
+        wallpaperDimChoice.setOnClickListener(v -> showWallpaperDimPicker());
         animationsChoice = findViewById(R.id.animationsChoice);
         animationsChoice.setOnClickListener(v -> {
             animations = !animations;
@@ -97,7 +105,8 @@ public final class LauncherSettingsActivity extends Activity {
         followThemeChoice.setOnClickListener(v -> {
             if (!hasOnTvChoices()) return;
             choices.edit().remove("columns").remove(Config.ROWS_BELOW_DOCK_KEY).remove("animations")
-                    .remove("advanced_effects").remove(Config.WALLPAPER_CHOICE_KEY).commit();
+                    .remove("advanced_effects").remove(Config.WALLPAPER_CHOICE_KEY)
+                    .remove(Config.WALLPAPER_DIM_KEY).commit();
             Config current = Config.load(this);
             columns = current.columns;
             rowsBelowDock = current.rowsBelowDock;
@@ -154,6 +163,38 @@ public final class LauncherSettingsActivity extends Activity {
                     setResult(RESULT_OK);
                     refresh();
                 })
+                .setPositiveButton(R.string.wallpaper_choose, (dialog, which) -> openWallpaperDocument())
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
+    private void openWallpaperDocument() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("image/*")
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        try {
+            startActivityForResult(intent, REQUEST_WALLPAPER);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, R.string.wallpaper_picker_unavailable, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void showWallpaperDimPicker() {
+        int current = WallpaperImport.normalizeDim(choices.getInt(
+                Config.WALLPAPER_DIM_KEY, Config.DEFAULT_WALLPAPER_DIM));
+        String[] labels = new String[8];
+        for (int i = 0; i < labels.length; i++) {
+            labels[i] = getString(R.string.wallpaper_dim_percent, i * 10);
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.wallpaper_dim_label)
+                .setSingleChoiceItems(labels, current / 10, (dialog, which) -> {
+                    choices.edit().putInt(Config.WALLPAPER_DIM_KEY, which * 10).apply();
+                    setResult(RESULT_OK);
+                    dialog.dismiss();
+                    refresh();
+                })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
     }
@@ -191,13 +232,45 @@ public final class LauncherSettingsActivity extends Activity {
                 "none".equals(wallpaperCurrent) ? getString(R.string.wallpaper_none)
                         : wallpaperCurrent != null ? wallpaperCurrent
                         : getString(R.string.wallpaper_theme_default)));
+        int dim = WallpaperImport.normalizeDim(choices.getInt(
+                Config.WALLPAPER_DIM_KEY, Config.DEFAULT_WALLPAPER_DIM));
+        wallpaperDimChoice.setText(getString(R.string.wallpaper_dim_state, dim));
         followThemeChoice.setSelected(!hasOnTvChoices());
     }
 
     private boolean hasOnTvChoices() {
         return choices.contains("columns") || choices.contains(Config.ROWS_BELOW_DOCK_KEY)
                 || choices.contains("animations") || choices.contains("advanced_effects")
-                || choices.contains(Config.WALLPAPER_CHOICE_KEY);
+                || choices.contains(Config.WALLPAPER_CHOICE_KEY)
+                || choices.contains(Config.WALLPAPER_DIM_KEY);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != REQUEST_WALLPAPER || resultCode != RESULT_OK || data == null) return;
+        Uri uri = data.getData();
+        if (uri == null) return;
+        wallpaperImporter.execute(() -> {
+            try {
+                File imported = WallpaperImport.importImage(this, uri);
+                runOnUiThread(() -> {
+                    choices.edit().putString(Config.WALLPAPER_CHOICE_KEY, imported.getName()).apply();
+                    setResult(RESULT_OK);
+                    Toast.makeText(this, R.string.wallpaper_imported, Toast.LENGTH_SHORT).show();
+                    refresh();
+                });
+            } catch (IOException | RuntimeException failure) {
+                runOnUiThread(() -> Toast.makeText(this, R.string.wallpaper_import_failed,
+                        Toast.LENGTH_LONG).show());
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        wallpaperImporter.shutdownNow();
+        super.onDestroy();
     }
 
     private void open(Intent intent) {
