@@ -455,10 +455,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             if (grid.getPaddingTop() != want) {
                 grid.setPadding(grid.getPaddingLeft(), want, grid.getPaddingRight(), grid.getPaddingBottom());
             }
-            // Cold start or column count > 4: the first focus can run before the grid has its final width or
-            // padding, leaving the glass at the XML design size until a key is pressed.
-            grid.post(this::refitGlass);
+            // Cold start or column count > 4: park a zero-row dock before refitting the glass. Otherwise the
+            // first focus is measured against the pre-parking row position and leaves its highlight in the old
+            // upper-left location until the user moves focus.
             if (dockRow && rowsBelowDock <= 0) grid.post(this::parkDockOnlyRow);
+            grid.post(this::refitGlass);
         });
 
         // Keep the glass glued to its tile while the grid scrolls.

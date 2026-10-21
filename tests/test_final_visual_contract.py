@@ -42,3 +42,13 @@ def test_tvhome_settings_reuses_the_wallpaper_backdrop():
     assert "settingsWallpaper.start();" in activity
     assert 'android:id="@+id/settingsRoot"' in layout
     assert 'android:background="@android:color/transparent"' in layout
+
+
+def test_cold_start_parks_dock_before_refitting_glass():
+    text = MAIN.read_text(encoding="utf-8")
+    start = text.index("grid.addOnLayoutChangeListener")
+    end = text.index("// Keep the glass glued to its tile while the grid scrolls.", start)
+    layout_listener = text[start:end]
+    assert layout_listener.index("grid.post(this::parkDockOnlyRow);") < layout_listener.index(
+        "grid.post(this::refitGlass);"
+    )
