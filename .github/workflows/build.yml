@@ -55,24 +55,17 @@ jobs:
           path: launcher/app/build/outputs/apk/release/app-release-unsigned.apk
           if-no-files-found: error
           retention-days: 3
-      - name: Publish unsigned handoff branch
+      - name: Publish unsigned handoff release
         if: success()
-        shell: bash
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ci-v13.2-${{ github.sha }}
+          name: TVHome V13.2 CI unsigned handoff
+          prerelease: true
+          generate_release_notes: false
+          body: |
+            CI-generated unsigned SDK34 handoff artifact for local signing and device acceptance.
+            This is not the signed production release.
+          files: launcher/app/build/outputs/apk/release/app-release-unsigned.apk
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          target="ci-artifacts/${GITHUB_SHA}/TVHome-MFTR0-1.0.0-v13.2-unsigned.apk"
-          publish_branch="ci-unsigned-v13.2"
-          # Keep the public handoff branch artifact-only. The source commit now contains
-          # release workflows, and GITHUB_TOKEN cannot create a branch commit that adds
-          # workflow files without the separate workflow scope.
-          git switch --orphan "$publish_branch"
-          git rm -r --cached . >/dev/null 2>&1 || true
-          mkdir -p "$(dirname "$target")"
-          cp launcher/app/build/outputs/apk/release/app-release-unsigned.apk "$target"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f "$target"
-          git commit -m "ci: publish unsigned handoff artifact ${GITHUB_SHA::12}"
-          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${publish_branch}"
+          GITHUB_TOKEN: ${{ github.token }}
