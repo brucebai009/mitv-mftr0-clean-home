@@ -27,6 +27,14 @@ function Read-AdbProperty([string]$Name) {
     return (Invoke-AdbText @('shell', 'getprop', $Name)).Trim()
 }
 
+function Read-OptionalPackagePath([string]$Package) {
+    $output = (& $AdbPath '-s' $Serial 'shell' 'pm' 'path' $Package 2>&1 | Out-String).Trim()
+    $exitCode = $LASTEXITCODE
+    if ($exitCode -eq 0) { return $output }
+    if ([string]::IsNullOrWhiteSpace($output) -or $output -match '(?i)unknown package|unable to find') { return '' }
+    throw "ADB package query failed ($exitCode): $output"
+}
+
 function Write-Journal([string]$Message) {
     Add-Content -LiteralPath $JournalPath -Value "$(Get-Date -Format o) $Message" -Encoding UTF8
 }
@@ -76,7 +84,7 @@ $originalHome = Read-HomeComponent
 $originalPackage = $originalHome.Split('/')[0]
 $originalDisabled = (Invoke-AdbText @('shell', 'pm', 'list', 'packages', '-d', '--user', '0')) -match "(?m)^package:$([regex]::Escape($originalPackage))$"
 if (-not (Invoke-AdbText @('shell', 'pm', 'path', $originalPackage))) { throw "Original HOME package is not installed: $originalPackage" }
-$existingPackage = Invoke-AdbText @('shell', 'pm', 'path', $PackageName)
+$existingPackage = Read-OptionalPackagePath $PackageName
 $packageDump = if ($existingPackage) { Invoke-AdbText @('shell', 'dumpsys', 'package', $PackageName) } else { '' }
 
 $snapshot = [ordered]@{
