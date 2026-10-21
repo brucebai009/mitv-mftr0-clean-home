@@ -1,14 +1,14 @@
-# WONJEAN / MiTV CleanYourTV execution report
+# MiTV CleanYourTV execution report
 
 Date: 2026-10-21 (Asia/Hong_Kong)
 
 ## IMPLEMENTATION
 
-- Repository root: `E:\MiTV-CleanYourTV\repo`
-- Local branch: `bruce/mitv-clean-home-v1`
+- Repository root: `repository root`
+- Local branch: `release/v13.2`
 - Implementation commit: `2b2d751` (`Add exact Xiaomi TV profile and preserve native preview`).
 - Upstream archive: fixed commit `d27bb0604c75b9b144fb278e6e5d0671074b25f9`
-- Product version: `2.4-bruce.1`, versionCode `6`.
+- Product version: `2.4.0`, versionCode `6`.
 - The implementation is an additive exact-device profile. It does not change the upstream package identity, uninstall applications, clear application data, disable the factory launcher, or write system partitions.
 
 ## LOCAL TECHNICAL
@@ -21,7 +21,7 @@ Date: 2026-10-21 (Asia/Hong_Kong)
 
 ## DEVICE RUNTIME
 
-- ADB device: `192.168.5.175:5555`, authorized after the user confirmed the TV prompt.
+- ADB device: `<TV_HOST>:5555`, authorized after the user confirmed the TV prompt.
 - Device: `MiTV-MFTR0`, `freeguy`, Android 11/API 30, fingerprint recorded in `DECISIONS.md`.
 - BrowseHere `com.tcl.browser` and VLC `org.videolan.vlc` were present and enabled before changes; no app data was changed.
 - Original HOME and the system TV Input chain were observed. The new launcher package was absent during baseline capture and was not installed while the conforming build was unavailable.

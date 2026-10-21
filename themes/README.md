@@ -7,9 +7,9 @@ Choices made in Launcher settings take priority until you choose Follow theme. P
 using `tools/theme.sh --reset` also clears those on-TV column and motion choices.
 
 ```bash
-TV_HOST=192.168.1.50 tools/theme.sh themes/aurora          # push a theme and restart Home
-TV_HOST=192.168.1.50 tools/theme.sh --reset                # back to the built-in config.xml
-powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.168.1.50 themes\aurora
+TV_HOST=192.0.2.1 tools/theme.sh themes/aurora             # push a theme and restart Home
+TV_HOST=192.0.2.1 tools/theme.sh --reset                   # back to the built-in config.xml
+powershell -ExecutionPolicy Bypass -File tools\theme.ps1 -TvHost 192.0.2.1 themes\aurora
 ```
 
 | Theme | What it does |

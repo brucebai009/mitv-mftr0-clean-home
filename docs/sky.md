@@ -13,7 +13,7 @@ launcher built from this repository behaves exactly like before until a theme tu
 Push that as a theme's `config.json` and restart Home:
 
 ```bash
-TV_HOST=192.168.1.50 tools/theme.sh themes/your-theme
+TV_HOST=192.0.2.1 tools/theme.sh themes/your-theme
 ```
 
 ## What it draws

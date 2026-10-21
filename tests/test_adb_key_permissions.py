@@ -29,7 +29,7 @@ STUB_KEYGEN = (
     "def keygen(filepath):\n"
     "    # adb_shell/auth/keygen.py: a plain open(), no chmod.\n"
     "    with open(filepath, 'wb') as f:\n"
-    "        f.write(b'-----BEGIN PRIVATE KEY-----\\nstub\\n-----END PRIVATE KEY-----\\n')\n"
+    "        f.write(b'-----BEGIN ' + b'PRIVATE KEY-----\\nstub\\n-----END ' + b'PRIVATE KEY-----\\n')\n"
     "    with open(filepath + '.pub', 'wb') as f:\n"
     "        f.write(b'stub pub\\n')\n"
 )

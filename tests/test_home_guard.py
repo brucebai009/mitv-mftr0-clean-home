@@ -138,13 +138,13 @@ class HomeGuardTest(unittest.TestCase):
         self.state_path.write_text(json.dumps(state))
 
     def disable(self, entry, extra_env=None, list_path=None):
-        env = dict(os.environ, TV_HOST="192.168.1.50", HOME=str(self.home),
+        env = dict(os.environ, TV_HOST="192.0.2.50", HOME=str(self.home),
                    FAKE_TV_STATE=str(self.state_path), **(extra_env or {}))
         if entry == "sh":
             argv = ["bash", str(self.tools / "disable.sh"), str(list_path or self.list_path)]
         else:
             argv = [PWSH, "-NoProfile", "-File", str(self.tools / "disable.ps1"),
-                    "-TvHost", "192.168.1.50", str(list_path or self.list_path)]
+                    "-TvHost", "192.0.2.50", str(list_path or self.list_path)]
         result = subprocess.run(argv, cwd=self.repo, env=env, capture_output=True, text=True,
                                 timeout=180)
         with open(self.state_path) as f:

@@ -3,15 +3,15 @@
 # restart Home so it picks it up. The launcher reads the files from its external files directory and
 # overlays config.json on its built-in config.xml; see themes/README.md for the keys.
 #
-# Usage: TV_HOST=192.168.1.50 tools/theme.sh themes/aurora
-#        TV_HOST=192.168.1.50 tools/theme.sh --reset        # remove the overlay, back to config.xml
+# Usage: TV_HOST=192.0.2.1 tools/theme.sh themes/aurora
+#        TV_HOST=192.0.2.1 tools/theme.sh --reset           # remove the overlay, back to config.xml
 set -euo pipefail
 # Resolve the theme folder against the caller's directory before moving into tools/.
 # Git Bash's pwd says /c/Users/..., which the Windows Python cannot open; pwd -W gives C:/Users/... (as in disable.sh).
 THEME_ARG="${1:-}"
 case "$THEME_ARG" in --reset|"") ;; /*) ;; *) THEME_ARG="$(pwd -W 2>/dev/null || pwd)/$THEME_ARG" ;; esac
 cd "$(dirname "$0")"
-: "${TV_HOST:?set TV_HOST to the TV IP address, e.g. TV_HOST=192.168.1.50 $0 themes/aurora}"
+: "${TV_HOST:?set TV_HOST to the TV IP address, e.g. TV_HOST=192.0.2.1 $0 themes/aurora}"
 PY=venv/bin/python
 [ -x "$PY" ] || PY=venv/Scripts/python.exe
 [ -x "$PY" ] || { echo "run: python3 -m venv tools/venv && tools/venv/bin/pip install -r tools/requirements.txt" >&2; exit 1; }

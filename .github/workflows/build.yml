@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: read
-  checks: write
 
 jobs:
   build:
@@ -38,93 +37,9 @@ jobs:
         working-directory: launcher
         shell: bash
         run: |
-          set -uo pipefail
+          set -euo pipefail
           chmod +x gradlew
-          set +e
-          ./gradlew --no-daemon --stacktrace testReleaseUnitTest lintRelease assembleRelease 2>&1 | tee ../build-output.log
-          status=${PIPESTATUS[0]}
-          exit "$status"
-      - name: Upload build diagnostics
-        if: failure()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: tvhome-build-diagnostics
-          path: build-output.log
-          if-no-files-found: error
-          retention-days: 3
-      - name: Publish build failure summary
-        if: failure()
-        shell: bash
-        run: |
-          set -u
-          if [ -f build-output.log ]; then
-            {
-              echo '### Gradle failure excerpt'
-              echo '```text'
-              tail -n 120 build-output.log
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
-            grep -E 'FAILURE:|What went wrong|Execution failed|error:|> Task .*FAILED|Could not resolve' build-output.log | tail -n 25 | while IFS= read -r line; do
-              safe=${line:0:900}
-              echo "::error title=Gradle failure::$safe"
-            done
-            tail -n 60 build-output.log | while IFS= read -r line; do
-              [ -n "$line" ] || continue
-              safe=${line:0:900}
-              echo "::warning title=Gradle tail::$safe"
-            done
-            grep -i -E 'error|warning|issue|lint|invalid|deprecated|permission|manifest|resource' build-output.log | tail -n 80 | while IFS= read -r line; do
-              [ -n "$line" ] || continue
-              safe=${line:0:900}
-              echo "::warning title=Gradle diagnostic::$safe"
-            done
-          fi
-          report='launcher/app/build/reports/lint-results-release.xml'
-          if [ -f "$report" ]; then
-            python3 - "$report" <<'PY'
-          import sys
-          import xml.etree.ElementTree as ET
-
-          report = sys.argv[1]
-          root = ET.parse(report).getroot()
-          for issue in root.findall('issue'):
-              if issue.attrib.get('severity') not in {'error', 'fatal'}:
-                  continue
-              location = issue.find('location')
-              path = location.attrib.get('file', report) if location is not None else report
-              line = ''
-              if location is not None:
-                  line = (location.attrib.get('line') or '').strip()
-              message = issue.attrib.get('message', 'lint error')
-              issue_id = issue.attrib.get('id', 'Lint')
-              suffix = f" file={path}"
-              if line.isdigit():
-                  suffix += f" line={line}"
-              print(f"::error title={issue_id}{suffix}::{message[:900]}")
-          PY
-          fi
-      - name: Publish machine-readable failure log
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const log = fs.existsSync('build-output.log')
-              ? fs.readFileSync('build-output.log', 'utf8')
-              : 'build-output.log was not produced';
-            const summary = log.slice(-60000);
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'Gradle failure details',
-              head_sha: context.sha,
-              status: 'completed',
-              conclusion: 'failure',
-              output: {
-                title: 'SDK34 Gradle failure log',
-                summary
-              }
-            });
+          ./gradlew --no-daemon testReleaseUnitTest lintRelease assembleRelease
       - name: Check product artifact
         shell: bash
         run: |

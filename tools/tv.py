@@ -27,7 +27,7 @@ for _stream in (sys.stdout, sys.stderr):
 HOST = os.environ.get("TV_HOST")
 PORT = int(os.environ.get("TV_PORT", "5555"))
 if not HOST:
-    sys.exit("Set TV_HOST to your TV's IP address, e.g.  TV_HOST=192.168.1.50 tools/tv.py --probe\n"
+    sys.exit("Set TV_HOST to your TV's IP address, e.g.  TV_HOST=192.0.2.1 tools/tv.py --probe\n"
              "(find it under Settings → Network, or look for the TV in `arp -a`)")
 KEYDIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "adbkey")
 KEY = os.path.join(KEYDIR, "adbkey")

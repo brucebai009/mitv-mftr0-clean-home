@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.4-bruce.1 — 2026-10-21
+## 2.4.0 — 2026-10-21
 
 - Added an exact Xiaomi MiTV-MFTR0 / OS2.0.5.0.RFTMATV device profile.
 - Added optional observed HDMI, AV, ATV, DTMB and Xiaomi Settings routes.

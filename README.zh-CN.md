@@ -94,7 +94,7 @@
 
 ## 手动操作
 
-以下命令从仓库根目录运行。`192.168.1.50` 是示例地址，请替换为电视的局域网地址。`tools/tv.py` 默认连接传统 TCP ADB 的 5555 端口；如果电视只提供需要配对的「无线调试」，须先按[操作提示词中的连接步骤](PROMPT.md)配对并开启 5555 端口，才能使用下列命令。
+以下命令从仓库根目录运行。`192.0.2.1` 是文档示例地址，请替换为电视的局域网地址。`tools/tv.py` 默认连接传统 TCP ADB 的 5555 端口；如果电视只提供需要配对的「无线调试」，须先按[操作提示词中的连接步骤](PROMPT.md)配对并开启 5555 端口，才能使用下列命令。
 
 ### 1. 准备连接工具
 
@@ -103,7 +103,7 @@
 ```bash
 python3 -m venv tools/venv
 tools/venv/bin/pip install -r tools/requirements.txt
-export TV_HOST=192.168.1.50
+export TV_HOST=192.0.2.1
 
 # 读取型号、Android 版本和固件
 tools/venv/bin/python -I tools/tv.py --probe
@@ -134,7 +134,7 @@ sdkmanager "platforms;android-34" "build-tools;34.0.0"
 Linux 安装脚本可查找 `~/Android/Sdk` 和 `PATH` 中的 Java。准备好环境后运行：
 
 ```bash
-TV_HOST=192.168.1.50 launcher/build-and-install.sh
+TV_HOST=192.0.2.1 launcher/build-and-install.sh
 ```
 
 **此 Shell 脚本不仅安装 APK，还会切换默认 HOME，并按检测结果停用原始桌面。** 它先确认新桌面能够启动，再完成切换；切换失败时尝试回退。自动识别仅支持 `com.google.android.tvlauncher`、`com.google.android.apps.tv.launcherx`、`com.google.android.leanbacklauncher` 和 `com.mitv.tvhome`；若识别失败，需核对设备后指定 `STOCK_LAUNCHER=<包名>`，或使用 `none`。
@@ -142,7 +142,7 @@ TV_HOST=192.168.1.50 launcher/build-and-install.sh
 可使用 `STOCK_LAUNCHER=<包名>` 指定原始桌面；如果希望保留原始桌面的启用状态，使用：
 
 ```bash
-TV_HOST=192.168.1.50 STOCK_LAUNCHER=none launcher/build-and-install.sh
+TV_HOST=192.0.2.1 STOCK_LAUNCHER=none launcher/build-and-install.sh
 ```
 
 `none` 只表示不停用原始桌面，**仍会将 CleanYourTV 设为默认 HOME**。
@@ -154,7 +154,7 @@ TV_HOST=192.168.1.50 STOCK_LAUNCHER=none launcher/build-and-install.sh
 ```powershell
 python -m venv tools\venv
 tools\venv\Scripts\python.exe -m pip install -r tools\requirements.txt
-powershell -ExecutionPolicy Bypass -File launcher\build-and-install.ps1 -TvHost 192.168.1.50
+powershell -ExecutionPolicy Bypass -File launcher\build-and-install.ps1 -TvHost 192.0.2.1
 ```
 
 PowerShell 安装脚本使用 `-StockLauncher <包名>` 指定原始桌面，或使用 `-StockLauncher none` 保留其启用状态。当前 PowerShell 脚本会先请求设置新 HOME，再检查新桌面是否启动，与上述 Shell 脚本的顺序不同；操作前请确认 ADB 恢复路径可用。清理与恢复分别使用 [`tools/disable.ps1`](tools/disable.ps1) 和 [`tools/restore.ps1`](tools/restore.ps1)。
@@ -181,13 +181,13 @@ PowerShell 安装脚本使用 `-StockLauncher <包名>` 指定原始桌面，或
 主题通过 `config.json` 覆盖内置配置，还可提供背景色和壁纸。使用示例：
 
 ```bash
-TV_HOST=192.168.1.50 tools/theme.sh themes/aurora
+TV_HOST=192.0.2.1 tools/theme.sh themes/aurora
 ```
 
 恢复内置主题：
 
 ```bash
-TV_HOST=192.168.1.50 tools/theme.sh --reset
+TV_HOST=192.0.2.1 tools/theme.sh --reset
 ```
 
 主题格式和可用配置见 [`themes/README.md`](themes/README.md)。
@@ -214,13 +214,13 @@ TV_HOST=192.168.1.50 tools/theme.sh --reset
 将以下路径替换为**实际使用过的列表**后恢复：
 
 ```bash
-TV_HOST=192.168.1.50 tools/restore.sh examples/xiaomi-mi-tv-4a/debloat.txt
+TV_HOST=192.0.2.1 tools/restore.sh examples/xiaomi-mi-tv-4a/debloat.txt
 ```
 
 如需指定原始桌面的备用包名，可增加最后一个参数。Google TV 常用的是 `com.google.android.apps.tv.launcherx`，但应以实际设备为准：
 
 ```bash
-TV_HOST=192.168.1.50 tools/restore.sh "examples/你的机型/debloat.txt" com.google.android.apps.tv.launcherx
+TV_HOST=192.0.2.1 tools/restore.sh "examples/你的机型/debloat.txt" com.google.android.apps.tv.launcherx
 ```
 
 - 有记录时，优先恢复当时实际拥有 HOME 的组件；当时没有解析到 HOME 或 HOME 已属于 CleanYourTV 时，使用指定的备用包名，未指定则默认尝试 `com.google.android.tvlauncher`。

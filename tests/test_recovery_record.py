@@ -65,7 +65,7 @@ class Device:
 
 def connect():
     if state.get("unreachable"):
-        raise ConnectionError("could not connect to 192.168.1.50:5555")
+        raise ConnectionError("could not connect to 192.0.2.50:5555")
     return Device()
 
 
@@ -128,7 +128,7 @@ class RecoveryRecordTest(unittest.TestCase):
         self.state_path.write_text(json.dumps(state))
 
     def run_script(self, script, *args):
-        env = dict(os.environ, TV_HOST="192.168.1.50", HOME=str(self.home),
+        env = dict(os.environ, TV_HOST="192.0.2.50", HOME=str(self.home),
                    FAKE_TV_STATE=str(self.state_path))
         return subprocess.run(
             ["bash", str(self.repo / "tools" / script), *args],

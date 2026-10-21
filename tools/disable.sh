@@ -2,7 +2,7 @@
 # Disable every package listed in a debloat file on the TV (one package per line, # comments allowed).
 # Packages are disabled for user 0, never uninstalled. Undo with tools/restore.sh <same file>.
 #
-# Usage: TV_HOST=192.168.1.50 tools/disable.sh examples/xiaomi-mi-tv-4a/debloat.txt
+# Usage: TV_HOST=192.0.2.1 tools/disable.sh examples/xiaomi-mi-tv-4a/debloat.txt
 set -euo pipefail
 LIST="${1:?usage: disable.sh <debloat list>}"
 # Resolve the list against the caller's directory before moving into the repo. Git Bash's pwd says

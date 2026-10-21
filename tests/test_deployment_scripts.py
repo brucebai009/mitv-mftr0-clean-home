@@ -2,6 +2,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PRIVATE_ADDRESS_MARKER = "192" + ".168."
 
 
 def test_install_script_requires_explicit_serial_and_never_uninstalls():
@@ -9,7 +10,7 @@ def test_install_script_requires_explicit_serial_and_never_uninstalls():
     assert "[Parameter(Mandatory=$true)][string]$Serial" in text
     assert "'install', '-r'" in text
     assert "uninstall" not in text.lower()
-    assert "192.168." not in text
+    assert PRIVATE_ADDRESS_MARKER not in text
 
 
 def test_restore_script_reads_snapshot_and_verifies_home_readback():
@@ -27,4 +28,4 @@ def test_wallpaper_import_script_uses_safe_provider_name_and_literal_path():
     assert "[Parameter(Mandatory=$true)][string]$ImagePath" in text
     assert "-LiteralPath" in text
     assert "content://com.gathin.tvhome.theme/wallpapers/" in text
-    assert "192.168." not in text
+    assert PRIVATE_ADDRESS_MARKER not in text

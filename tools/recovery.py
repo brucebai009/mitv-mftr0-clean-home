@@ -283,7 +283,7 @@ def main():
         return save(args[1], host)
     if len(args) in (2, 3) and args[0] == "--commands":
         if not host:
-            sys.stderr.write("Set TV_HOST to your TV's IP address, e.g. TV_HOST=192.168.1.50\n")
+            sys.stderr.write("Set TV_HOST to your TV's IP address, e.g. TV_HOST=192.0.2.1\n")
         stock = args[2] if len(args) == 3 else "com.google.android.tvlauncher"
         for command in restore_commands(args[1], stock, host):
             print(command)

@@ -2,7 +2,7 @@
 # Build the launcher APK and install it on the TV as the default home screen.
 set -euo pipefail
 cd "$(dirname "$0")"
-: "${TV_HOST:?set TV_HOST to the TV IP address, e.g. TV_HOST=192.168.1.50 $0}"
+: "${TV_HOST:?set TV_HOST to the TV IP address, e.g. TV_HOST=192.0.2.1 $0}"
 # macOS: java_home or Homebrew; Linux: the java on PATH.
 export JAVA_HOME="${JAVA_HOME:-$(/usr/libexec/java_home -v 17 2>/dev/null || { [ -d /opt/homebrew/opt/openjdk@17 ] && echo /opt/homebrew/opt/openjdk@17; } || java -XshowSettings:properties -version 2>&1 | awk '/java.home/ {print $3}')}"
 # Android Studio's default SDK location on macOS, then on Linux, then Homebrew's command-line tools.

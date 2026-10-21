@@ -2,8 +2,8 @@
 
 ## Spec and scope
 
-- Authority: `E:/MiTV-CleanYourTV/private/incoming/MiTV_V13_1_AppleStyle_Consolidated_Task/MiTV-V13-1/TASK.md` and its referenced `FEATURE_SPEC.md`, `UI_SPEC.md`, `ACCEPTANCE_MATRIX.csv`, `AUDIT_FINDINGS.md`, and baseline report.
-- Worktree: `E:/MiTV-CleanYourTV/repo` on `bruce/mitv-clean-home-v1`, preserving the existing V12.1 implementation and all user data.
+- Authority: the local V13.1 task bundle and its referenced feature, UI, matrix, audit, and baseline documents.
+- Worktree: `repository root` on `release/v13.2`, preserving the existing implementation and all user data.
 - Device target: MiTV-MFTR0, Android 11/API 30, user 0, ARM32; current ADB audit has no online device, so physical acceptance remains explicitly pending until a device is connected.
 - Product boundary: extend existing Java/XML/config/provider/installer architecture. Do not replace the original Xiaomi HOME, disable or uninstall original apps, clear user data, write unknown secure settings, use root/remount/system signing/Device Owner/Shizuku/accessibility takeover, fake HDMI/YouTube evidence, or publish private identifiers and logs.
 - Release identity: same application ID and signing certificate, versionCode greater than 7, new candidate name and manifest; never overwrite `v1.0.0-rc.1-tools.1`.
@@ -11,7 +11,7 @@
 ## Expected deliverables
 
 - Source changes and JVM tests in the existing Android module.
-- Private run evidence outside the public export under `E:/MiTV-CleanYourTV/deliverables/v13.1-device/<timestamp>/`.
+- Private run evidence outside the public export under a local timestamped deliverables directory.
 - `CAPABILITY_AUDIT.md`, `capabilities.json`, `HOME_BOOT_REPORT.md`, `UI_COMPARISON.md`, `PREVIEW_CAPABILITY_REPORT.md`, `DEBLOAT_AUDIT.md`, `TEST_FAILURE_CLASSIFICATION.md`, and `V13_1_EXECUTION_REPORT.md` with evidence-class labels.
 - Versioned unsigned build plus locally signed APK when the signing key is available, a manifest-driven InstallKit, SHA-256 records, and a scrubbed public source/release staging directory. Public publication is a separate side effect and is not performed without an explicit user publish authorization.
 

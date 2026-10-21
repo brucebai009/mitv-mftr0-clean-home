@@ -2,7 +2,7 @@
 # default home screen. Uses Android Studio's bundled JDK and the default SDK location unless
 # JAVA_HOME / ANDROID_HOME are set.
 #
-# Usage: launcher\build-and-install.ps1 -TvHost 192.168.1.50 [-StockLauncher <package>|none]
+# Usage: launcher\build-and-install.ps1 -TvHost 192.0.2.1 [-StockLauncher <package>|none]
 #        The stock launcher is detected from the TV when -StockLauncher is not given.
 #        [-InputKeyService]   remote's Input button opens the input switcher (Google TV), plus config.xml
 #                             input_key_keycodes and app_keys; re-pass on every install

@@ -48,7 +48,7 @@ in their home forwards your connection to the TV's normal local address:
   Subnet router section, but it's read-only when you open it from a tagged device. Without SSH, a
   one-off Task Scheduler task (Control Panel → Task Scheduler → Create → Triggered Task →
   User-defined script, user root, then Run and delete it) runs
-  `/var/packages/Tailscale/target/bin/tailscale set --advertise-routes=192.168.1.0/24`; the
+  `/var/packages/Tailscale/target/bin/tailscale set --advertise-routes=192.0.2.0/24`; the
   setting persists;
 - not a phone: the Android and iOS apps can't route their home network.
 
@@ -61,18 +61,18 @@ address, from the TV's network settings):
 
 ```bash
 # Mac (standalone app without the CLI: /Applications/Tailscale.app/Contents/MacOS/Tailscale set ...)
-sudo tailscale set --advertise-routes=192.168.1.0/24
+sudo tailscale set --advertise-routes=192.0.2.0/24
 # Windows, PowerShell as administrator, after enabling IP forwarding
-tailscale set --advertise-routes=192.168.1.0/24
+tailscale set --advertise-routes=192.0.2.0/24
 # Linux, after enabling IP forwarding (https://tailscale.com/kb/1019/subnets)
-sudo tailscale set --advertise-routes=192.168.1.0/24
+sudo tailscale set --advertise-routes=192.0.2.0/24
 ```
 
 Approve the route in your admin console: Machines → the helper → Subnets → Edit. You then reach the
-TV at its local address, e.g. `TV_HOST=192.168.1.40`.
+TV at its local address, e.g. `TV_HOST=192.0.2.40`.
 
 **The two networks must not overlap.** If their home uses the same range as yours (both
-`192.168.1.x`, say), your computer can't tell their TV from a device at home. Use option A, or
+`192.0.2.x`, say), your computer can't tell their TV from a device at home. Use option A, or
 connect from another network.
 
 ## Connecting

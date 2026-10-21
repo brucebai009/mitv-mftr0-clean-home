@@ -32,7 +32,7 @@ and expect a signing conflict if that application's APK is installed later.
 From the repository root, with the normal Java/SDK and Python prerequisites installed:
 
 ```bash
-export TV_HOST=192.168.1.50
+export TV_HOST=192.0.2.1
 PY=tools/venv/bin/python
 "$PY" -I tools/tv.py 'pm path com.ts.launcher'
 "$PY" -I tools/tv.py 'cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME'

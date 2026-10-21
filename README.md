@@ -259,13 +259,13 @@ Everything the assistant does, you can run yourself. The tools need Python 3 and
 
 ```bash
 python3 -m venv tools/venv && tools/venv/bin/pip install -r tools/requirements.txt
-export TV_HOST=192.168.1.50                                   # your TV's IP address
+export TV_HOST=192.0.2.1                                      # your TV's IP address
 
 tools/venv/bin/python -I tools/tv.py --probe                 # model, Android version, firmware
 tools/venv/bin/python -I tools/tv.py 'pm list packages'      # one shell command on the TV
 tools/disable.sh examples/xiaomi-mi-tv-4a/debloat.txt        # apply a debloat list
 tools/restore.sh examples/xiaomi-mi-tv-4a/debloat.txt        # undo it, stock launcher back
-TV_HOST=192.168.1.50 launcher/build-and-install.sh           # build the launcher and make it Home
+TV_HOST=192.0.2.1 launcher/build-and-install.sh              # build the launcher and make it Home
 tools/theme.sh themes/aurora                                 # push a theme; --reset removes it
 ```
 
@@ -287,8 +287,8 @@ else is needed:
 
 ```powershell
 python -m venv tools\venv; tools\venv\Scripts\python.exe -m pip install -r tools\requirements.txt
-powershell -ExecutionPolicy Bypass -File launcher\build-and-install.ps1 -TvHost 192.168.1.50
-powershell -ExecutionPolicy Bypass -File tools\disable.ps1 -TvHost 192.168.1.50 examples\xiaomi-mi-tv-4a\debloat.txt
+powershell -ExecutionPolicy Bypass -File launcher\build-and-install.ps1 -TvHost 192.0.2.1
+powershell -ExecutionPolicy Bypass -File tools\disable.ps1 -TvHost 192.0.2.1 examples\xiaomi-mi-tv-4a\debloat.txt
 ```
 
 The install scripts ask the TV which launcher owns Home and only disable one they recognise
@@ -336,8 +336,8 @@ Keep the list you applied. The restore script replays the record, so a package y
 yourself stays disabled and Home goes back to the component that owned it:
 
 ```bash
-TV_HOST=192.168.1.50 tools/restore.sh examples/<your tv>/debloat.txt                                    # Android TV
-TV_HOST=192.168.1.50 tools/restore.sh examples/<your tv>/debloat.txt com.google.android.apps.tv.launcherx  # Google TV
+TV_HOST=192.0.2.1 tools/restore.sh examples/<your tv>/debloat.txt                                         # Android TV
+TV_HOST=192.0.2.1 tools/restore.sh examples/<your tv>/debloat.txt com.google.android.apps.tv.launcherx       # Google TV
 ```
 
 The `stock launcher` argument is only a fallback: with a record, the launcher that actually owned Home
