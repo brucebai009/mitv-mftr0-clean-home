@@ -26,6 +26,12 @@ public class TileFitTest {
     }
 
     @Test
+    public void noRowsBelowDockLeavesNoRoomForAVisibleNextRow() {
+        assertEquals(0f, AppAdapter.bottomRoomDp(0), 0f);
+        assertEquals(AppAdapter.BOTTOM_ROOM_DP, AppAdapter.bottomRoomDp(1), 0f);
+    }
+
+    @Test
     public void dockTitleAndRowsFitTheHeightUnlessThatMeansTinyTiles() {
         int floor = Math.round(AppAdapter.tileWidthPx(INNER, 4, D) * AppAdapter.MIN_HEIGHT_FIT);
         for (int rows = 1; rows <= 3; rows++) {
