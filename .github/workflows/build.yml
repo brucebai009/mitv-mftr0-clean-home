@@ -37,9 +37,20 @@ jobs:
         working-directory: launcher
         shell: bash
         run: |
-          set -euo pipefail
+          set -uo pipefail
           chmod +x gradlew
-          ./gradlew --no-daemon testReleaseUnitTest lintRelease assembleRelease
+          set +e
+          ./gradlew --no-daemon --stacktrace testReleaseUnitTest lintRelease assembleRelease 2>&1 | tee ../build-output.log
+          status=${PIPESTATUS[0]}
+          exit "$status"
+      - name: Upload build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tvhome-build-diagnostics
+          path: build-output.log
+          if-no-files-found: error
+          retention-days: 3
       - name: Check product artifact
         shell: bash
         run: |
