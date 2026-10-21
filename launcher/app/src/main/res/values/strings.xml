@@ -61,6 +61,13 @@
     <string name="input_key_service_description">Opens the input switcher when the remote\'s Input button is pressed.</string>
     <string name="home_key_name">Home button</string>
     <string name="home_key_description">Makes the remote\'s Home button open this launcher.</string>
+    <string name="home_only_helper_name">TVHome Home helper</string>
+    <string name="home_only_helper_description">Handles only the physical Home button for TVHome. It does not read the screen or control other buttons.</string>
+    <string name="home_helper_off" translatable="false">需要在电视中启用Home辅助。</string>
+    <string name="home_helper_on" translatable="false">Home辅助已启用：单按Home回到TVHome，快速连按三次进入小米原厂桌面。</string>
+    <string name="home_helper_open_settings" translatable="false">打开电视辅助功能设置</string>
+    <string name="home_normal_behavior" translatable="false">单按Home回到TVHome，快速连按三次进入小米原厂桌面。</string>
+    <string name="home_unsupported" translatable="false">此电视暂未允许接管Home。你仍可从原厂应用列表打开TVHome。</string>
     <string name="card_prompt_title">New card from %1$s</string>
     <string name="card_prompt_body">%1$s can show a card on your home screen. Keeping it hidden leaves the app\'s normal tile as it is.</string>
     <string name="card_prompt_names">The card is named \'%1$s\'. The app is \'%2$s\'.</string>

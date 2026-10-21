@@ -118,6 +118,11 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/homeHelperChoice"
+            style="@style/SettingsRow"
+            android:layout_marginTop="18dp" />
+
+        <TextView
             android:id="@+id/tvSettingsChoice"
             style="@style/SettingsRow"
             android:layout_marginTop="18dp"

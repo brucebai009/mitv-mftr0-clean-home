@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -120,10 +121,22 @@ public final class LauncherSettingsActivity extends Activity {
             Toast.makeText(this, R.string.home_settings_help, Toast.LENGTH_LONG).show();
             open(new Intent(Settings.ACTION_HOME_SETTINGS));
         });
+        TextView homeHelperChoice = findViewById(R.id.homeHelperChoice);
+        homeHelperChoice.setOnClickListener(v -> open(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
+        refreshHomeHelper(homeHelperChoice);
         findViewById(R.id.tvSettingsChoice).setOnClickListener(v ->
                 open(new Intent(Settings.ACTION_SETTINGS)));
         refresh();
         columnChoices[Math.max(0, Math.min(columns - 4, 3))].requestFocus();
+    }
+
+    private void refreshHomeHelper(TextView choice) {
+        String enabled = Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        String service = getPackageName() + "/" + HomeOnlyAccessibilityService.class.getName();
+        boolean active = !TextUtils.isEmpty(enabled) && (":" + enabled + ":").contains(":" + service + ":");
+        choice.setText(active ? R.string.home_helper_on : R.string.home_helper_off);
+        choice.setContentDescription(getString(R.string.home_helper_open_settings));
     }
 
     private void reverseRow(TextView[] views) {
