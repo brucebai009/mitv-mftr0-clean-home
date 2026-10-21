@@ -68,6 +68,30 @@ jobs:
               echo "::error title=Gradle failure::$safe"
             done
           fi
+          report='launcher/app/build/reports/lint-results-release.xml'
+          if [ -f "$report" ]; then
+            python3 - "$report" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+
+          report = sys.argv[1]
+          root = ET.parse(report).getroot()
+          for issue in root.findall('issue'):
+              if issue.attrib.get('severity') not in {'error', 'fatal'}:
+                  continue
+              location = issue.find('location')
+              path = location.attrib.get('file', report) if location is not None else report
+              line = ''
+              if location is not None:
+                  line = (location.attrib.get('line') or '').strip()
+              message = issue.attrib.get('message', 'lint error')
+              issue_id = issue.attrib.get('id', 'Lint')
+              suffix = f" file={path}"
+              if line.isdigit():
+                  suffix += f" line={line}"
+              print(f"::error title={issue_id}{suffix}::{message[:900]}")
+          PY
+          fi
       - name: Check product artifact
         shell: bash
         run: |
