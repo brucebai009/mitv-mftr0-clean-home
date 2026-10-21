@@ -67,6 +67,6 @@ jobs:
           cp launcher/app/build/outputs/apk/release/app-release-unsigned.apk "$target"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$target"
+          git add -f "$target"
           git commit -m "ci: publish unsigned handoff artifact ${GITHUB_SHA::12}"
           git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/ci-unsigned
