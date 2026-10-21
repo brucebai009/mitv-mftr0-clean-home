@@ -1,0 +1,34 @@
+name: Publish TVHome release
+
+on:
+  push:
+    branches: [release-assets]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Publish final release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: mitv-v13.2-final
+          name: TVHome MFTR0 V13.2 final
+          prerelease: false
+          generate_release_notes: false
+          body: |
+            TVHome MFTR0 V13.2 final release.
+
+            This release contains the signed APK, strict release manifest and public install kit.
+            The Rain city source package and private acceptance media are intentionally not included.
+            Dynamic Rain city export remains blocked; the verified device fallback is the supplied static 4K PNG.
+          files: |
+            release-assets/v13.2/TVHome-MFTR0-1.0.0-v13.2.apk
+            release-assets/v13.2/TVHome-MFTR0-v13.2-public-install-kit.zip
+            release-assets/v13.2/release-manifest.json
+            release-assets/v13.2/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
