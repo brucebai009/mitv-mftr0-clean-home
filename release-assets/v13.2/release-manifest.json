@@ -5,11 +5,11 @@
   "versionName": "1.0.0-v13.2",
   "apk": {
     "fileName": "TVHome-MFTR0-1.0.0-v13.2.apk",
-    "sha256": "A62B4DC00FB6787140312CE546263643DEB82AFFA23D573600E839203AAE5F74",
+    "sha256": "98CE568C8E59022CCDDAB17D45428D3FCBC187C9E3A7F2EDA9D3315AA40D0B7C",
     "sizeBytes": 442091
   },
-  "certificateSha256": "8edb7ec47cf01743c0059740451a0dc4570b5312fe4c0e06c83595948f95d595",
-  "sourceCommit": "16edcd5ef30e3a462441c211cc84a2128ea924b2",
+  "certificateSha256": "8EDB7EC47CF01743C0059740451A0DC4570B5312FE4C0E06C83595948F95D595",
+  "sourceCommit": "bb1238cfaafe6685fd71c8dcb3da341c9e89654f",
   "build": {
     "tool": "GitHub Actions",
     "workflow": "Build TVHome",
@@ -25,9 +25,6 @@
     "lintRelease": "PASS",
     "publicPrivacyScan": "PASS",
     "deviceInstall": "PASS",
-    "staticRainWallpaper": "PASS",
-    "dynamicRainCity": "BLOCKED",
-    "originalHomePreserved": "PASS",
-    "contentPolicyAudit": "PASS"
+    "visualAudit": "PASS_WITH_LIMITATIONS"
   }
 }
