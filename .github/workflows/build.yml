@@ -51,6 +51,23 @@ jobs:
           path: build-output.log
           if-no-files-found: error
           retention-days: 3
+      - name: Publish build failure summary
+        if: failure()
+        shell: bash
+        run: |
+          set -u
+          if [ -f build-output.log ]; then
+            {
+              echo '### Gradle failure excerpt'
+              echo '```text'
+              tail -n 120 build-output.log
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            grep -E 'FAILURE:|What went wrong|Execution failed|error:|> Task .*FAILED|Could not resolve' build-output.log | tail -n 25 | while IFS= read -r line; do
+              safe=${line:0:900}
+              echo "::error title=Gradle failure::$safe"
+            done
+          fi
       - name: Check product artifact
         shell: bash
         run: |
