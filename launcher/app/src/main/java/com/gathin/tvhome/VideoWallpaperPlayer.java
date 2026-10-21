@@ -12,7 +12,6 @@ import java.io.File;
 final class VideoWallpaperPlayer implements TextureView.SurfaceTextureListener {
     interface Failure { void onFailure(); }
 
-    private final Context context;
     private final TextureView texture;
     private final File file;
     private final Failure failure;
@@ -22,7 +21,6 @@ final class VideoWallpaperPlayer implements TextureView.SurfaceTextureListener {
     private boolean closed;
 
     VideoWallpaperPlayer(Context context, TextureView texture, File file, Failure failure) {
-        this.context = context.getApplicationContext();
         this.texture = texture;
         this.file = file;
         this.failure = failure;
@@ -56,7 +54,8 @@ final class VideoWallpaperPlayer implements TextureView.SurfaceTextureListener {
         releaseSurface();
         surface = new Surface(surfaceTexture);
         try {
-            MediaPlayer next = new MediaPlayer(context);
+            // The Context constructor was added in API 34; keep the launcher minSdk at 26.
+            MediaPlayer next = new MediaPlayer();
             next.setDataSource(file.getPath());
             next.setLooping(true);
             next.setVolume(0f, 0f);
