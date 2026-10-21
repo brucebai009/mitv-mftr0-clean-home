@@ -136,6 +136,13 @@
             android:exported="true"
             android:permission="android.permission.WRITE_SECURE_SETTINGS" />
 
+        <!-- Installer recovery bridge: only TVHome-owned helper/boot/reset flags are accepted. -->
+        <provider
+            android:name=".RecoveryProvider"
+            android:authorities="${applicationId}.recovery"
+            android:exported="true"
+            android:permission="android.permission.WRITE_SECURE_SETTINGS" />
+
         <!-- The remote's Input button (KEYCODE_TV or KEYCODE_TV_INPUT) opens the input switcher, and input_key_keycodes and
          app_keys (config.xml or a theme) bring back other remote buttons; see InputKeyService. -->
         <service
