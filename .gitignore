@@ -1,0 +1,7 @@
+launcher/local.properties
+launcher/.gradle/
+launcher/build/
+launcher/app/build/
+*.apk
+*.aab
+tvhome-state/
