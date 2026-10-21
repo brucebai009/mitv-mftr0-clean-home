@@ -32,6 +32,8 @@
         </intent>
         <!-- China-market MIUI TV firmware: the Settings and Wi-Fi pills fall back to Xiaomi's settings app. -->
         <package android:name="com.xiaomi.mitv.settings" />
+        <!-- The verified Xiaomi profile may expose Gallery only through a regular launcher entry. -->
+        <package android:name="com.mitv.gallery" />
     </queries>
 
     <application

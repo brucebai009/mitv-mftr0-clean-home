@@ -196,6 +196,8 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final Map<String, String> launchActions;
     /** Tile names and bundled banners that replace the app's own (config.xml, app_labels and app_banners). */
     private final Map<String, String> appLabels, appBanners;
+    /** Verified ordinary-launcher entries that are not exposed as Leanback activities on this TV. */
+    private final DeviceProfile deviceProfile;
     private final List<Entry> items = new ArrayList<>();
 
     AppAdapter(Context ctx, TileListener listener, int dockSize, Config cfg) {
@@ -217,6 +219,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.launchActions = cfg.launchActions;
         this.appLabels = cfg.appLabels;
         this.appBanners = cfg.appBanners;
+        this.deviceProfile = DeviceProfile.load(ctx);
         // Tiles keep their identity across reload(), so a focused tile stays on its app instead of
         // its view being rebound to whatever app now sits in that slot.
         setHasStableIds(true);
@@ -233,6 +236,17 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Set<String> tvPackages = new HashSet<>();
         for (ResolveInfo ri : found) if (ri.activityInfo != null) tvPackages.add(ri.activityInfo.packageName);
         leanbackPackages = tvPackages;
+        if (deviceProfile.matchesDevice()) {
+            Set<String> addedProfilePackages = new HashSet<>(deviceProfile.additionalLaunchPackages());
+            Intent ordinaryProbe = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+            Set<String> profileSeen = new HashSet<>();
+            for (ResolveInfo ri : pm.queryIntentActivities(ordinaryProbe, 0)) {
+                if (ri.activityInfo == null || !addedProfilePackages.contains(ri.activityInfo.packageName)) continue;
+                if (!ri.activityInfo.exported || !profileSeen.add(ri.activityInfo.packageName)) continue;
+                found.add(ri);
+                tvPackages.add(ri.activityInfo.packageName);
+            }
+        }
         Set<String> added = LibraryApps.load(ctx);
         Set<String> removed = LibraryApps.loadRemoved(ctx);
         if (!added.isEmpty()) {
@@ -252,6 +266,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         for (ResolveInfo ri : found) {
             if (ri.activityInfo == null) continue;
             String pkg = ri.activityInfo.packageName;
+            if (deviceProfile.suppressAospSettingsTile() && pkg.equals("com.android.tv.settings")) continue;
             if (pkg.equals(ctx.getPackageName()) || !ri.activityInfo.exported
                     || !LibraryApps.visible(tvPackages.contains(pkg), hidden.contains(pkg), added.contains(pkg), removed.contains(pkg))) continue;
             ComponentName component = new ComponentName(pkg, ri.activityInfo.name);

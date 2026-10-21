@@ -106,6 +106,8 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
     private String inputAction;
     private String sourcePanelService;
     private String sourcePanelAction;
+    /** Exact-match vendor routes; empty when this firmware is not the verified Xiaomi profile. */
+    private DeviceProfile deviceProfile;
 
     private AppAdapter adapter;
     private RecyclerView grid;
@@ -303,6 +305,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         inputAction = cfg.inputAction;
         sourcePanelService = cfg.sourcePanelService;
         sourcePanelAction = cfg.sourcePanelAction;
+        deviceProfile = DeviceProfile.load(this);
 
         root = findViewById(R.id.root);
         root.setBackgroundColor(cfg.backgroundColor);
@@ -2014,6 +2017,11 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      * On firmware with a standard settings handler the behaviour is unchanged.
      */
     private Intent systemIntent(String standardAction) {
+        if (deviceProfile != null && deviceProfile.matchesDevice()) {
+            Intent vendor = Settings.ACTION_WIFI_SETTINGS.equals(standardAction)
+                    ? deviceProfile.wifiIntent() : deviceProfile.settingsIntent();
+            if (vendor != null && vendor.resolveActivity(getPackageManager()) != null) return vendor;
+        }
         Intent i = new Intent(standardAction);
         if (i.resolveActivity(getPackageManager()) != null) return i;
         i = new Intent().setComponent(new ComponentName(
@@ -2070,6 +2078,10 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             startActivity(i);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
+        } catch (SecurityException e) {
+            // Vendor activities may resolve but still reject an ordinary UID. Fail closed without
+            // taking over the stock launcher or changing the TV's system state.
+            Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -2077,6 +2089,13 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      *  which the Live TV app handles; where nothing takes that, the configured `input_action` is sent
      *  with the same URI instead (XGIMI's HDMI player only answers com.xgimi.action.hdmiPlayer). */
     private void openInput(String inputId) {
+        if (deviceProfile != null) {
+            DeviceProfile.Route route = deviceProfile.inputRoute(inputId);
+            if (route != null) {
+                open(route.intent());
+                return;
+            }
+        }
         Uri uri = TvContract.buildChannelUriForPassthroughInput(inputId);
         Intent view = new Intent(Intent.ACTION_VIEW).setDataAndType(uri, "vnd.android.cursor.item/channel")
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -2129,6 +2148,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             for (TvInputInfo info : inputs) inputIds.add(info.getId());
             Map<String, List<TvInputInfo>> cecDevices = new HashMap<>();
             for (TvInputInfo info : inputs) {
+                if (deviceProfile != null && deviceProfile.isInputExcluded(info.getId())) continue;
                 String parent = info.getParentId();
                 if (parent == null || !inputIds.contains(parent)) continue;
                 if (!info.isPassthroughInput() || info.isHidden(this)) continue;
@@ -2140,6 +2160,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             // so drop the HDMI status then. A TV with every port really in use loses it too.
             int hdmiPorts = 0, hdmiConnected = 0;
             for (TvInputInfo info : inputs) {
+                if (deviceProfile != null && deviceProfile.isInputExcluded(info.getId())) continue;
                 if (!info.isPassthroughInput() || info.getType() != TvInputInfo.TYPE_HDMI) continue;
                 if (info.getParentId() != null && inputIds.contains(info.getParentId())) continue;
                 hdmiPorts++;
@@ -2147,6 +2168,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
             }
             boolean hdmiStateBogus = hdmiPorts > 1 && hdmiConnected == hdmiPorts;
             for (TvInputInfo info : inputs) {
+                if (deviceProfile != null && deviceProfile.isInputExcluded(info.getId())) continue;
                 if (info.getType() == TvInputInfo.TYPE_TUNER
                         && (info.getServiceInfo().applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
                     // Prefer a hardware tuner: the framework names those ".../HW<n>". System apps such as
@@ -2201,6 +2223,14 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
                 addInputRow(rows, popup, hdmi ? R.drawable.ic_input : R.drawable.ic_av, label, state,
                         () -> openInput(id));
             }
+            // This Xiaomi firmware has hardware tuner inputs but no usable Leanback Live TV entry.
+            // Add the verified tuner routes directly, without inventing a package or URI handler.
+            if (deviceProfile != null && deviceProfile.matchesDevice()) {
+                addProfileTunerRow(rows, popup, tim,
+                        "com.mediatek.tvinput/.tuner.TunerInputService/HW1");
+                addProfileTunerRow(rows, popup, tim,
+                        "com.mediatek.tvinput/.tuner.TunerInputService/HW0");
+            }
         }
         // Nothing to list where there is no TvInputManager: the TV's own source panel switches inputs.
         if (rows.getChildCount() == 0 && !sourcePanelService.isEmpty()) {
@@ -2236,6 +2266,24 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         int alignment = getResources().getBoolean(R.bool.rtl_menu_bar) ? Gravity.END : Gravity.START;
         dropIn(popup, panel, anchor, alignment);
         rows.getChildAt(0).requestFocus();
+    }
+
+    private void addProfileTunerRow(LinearLayout rows, PopupWindow popup, TvInputManager tim, String inputId) {
+        DeviceProfile.Route route = deviceProfile.inputRoute(inputId);
+        if (route == null) return;
+        int state = -1;
+        boolean present = false;
+        for (TvInputInfo info : tim.getTvInputList()) {
+            if (inputId.equals(info.getId())) {
+                present = true;
+                state = tim.getInputState(inputId);
+                break;
+            }
+        }
+        if (!present) return;
+        if (rows.getChildCount() > 0) addSeparator(rows);
+        addInputRow(rows, popup, R.drawable.ic_av, route.label, state,
+                () -> openInput(route.inputId));
     }
 
     private PopupWindow glassPopup(View panel, int width) {
