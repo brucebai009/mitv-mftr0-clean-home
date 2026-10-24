@@ -11,7 +11,7 @@ import android.view.View;
 
 /**
  * A translucent glass slab: soft sheen fill, bright top specular, crisp rim and a faint outer glow.
- * One instance floats over the grid and is moved with spring animations between tiles.
+ * One instance is anchored to the currently focused rendered tile.
  */
 public class GlassView extends View {
 
@@ -59,6 +59,7 @@ public class GlassView extends View {
     }
 
     void setRadius(float px) {
+        if (Math.abs(radius - px) < 0.01f) return;
         radius = px;
         invalidate();
     }

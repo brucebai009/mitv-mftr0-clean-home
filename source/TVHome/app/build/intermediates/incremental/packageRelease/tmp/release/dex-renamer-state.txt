@@ -1,0 +1,4 @@
+#Thu Oct 22 14:24:08 HKT 2026
+base.0=E\:\\MiTV-CleanYourTV\\repo\\launcher\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.gathin.tvhome.WallpaperRotationTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-22T04:55:23" hostname="DESKTOP-1O2Q5KA" time="0.007">
+  <properties/>
+  <testcase name="findMatchesByName" classname="com.gathin.tvhome.WallpaperRotationTest" time="0.001"/>
+  <testcase name="imagesKeepsPicturesOnlySortedByName" classname="com.gathin.tvhome.WallpaperRotationTest" time="0.005"/>
+  <testcase name="dueOnlyWithRotationOnAndTheIntervalPassed" classname="com.gathin.tvhome.WallpaperRotationTest" time="0.0"/>
+  <testcase name="pickAvoidsThePreviousPictureWhenThereIsAnother" classname="com.gathin.tvhome.WallpaperRotationTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

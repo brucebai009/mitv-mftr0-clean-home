@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.gathin.tvhome.PreviewCapabilityClassifierTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-22T04:55:23" hostname="DESKTOP-1O2Q5KA" time="0.001">
+  <properties/>
+  <testcase name="vendorFailureIsReportedSeparately" classname="com.gathin.tvhome.PreviewCapabilityClassifierTest" time="0.001"/>
+  <testcase name="noSourceIsDistinctFromPermissionBlock" classname="com.gathin.tvhome.PreviewCapabilityClassifierTest" time="0.0"/>
+  <testcase name="callbackWithoutVisualIsNotClaimedAsSupported" classname="com.gathin.tvhome.PreviewCapabilityClassifierTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

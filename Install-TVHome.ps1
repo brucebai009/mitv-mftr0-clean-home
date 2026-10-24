@@ -97,14 +97,17 @@ function Read-ForegroundState {
     $activity = Invoke-AdbText @('shell', 'dumpsys', 'activity', 'activities')
     $window = Invoke-AdbText @('shell', 'dumpsys', 'window')
     $resumed = ''
+    $activityFocusedApp = ''
     foreach ($line in ($activity -split '\r?\n')) {
         if ($line -match '(?:topResumedActivity|mResumedActivity)[:=].*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
             $resumed = Normalize-Component $matches[1]
-            break
+        }
+        if (-not $activityFocusedApp -and $line -match 'mFocusedApp=ActivityRecord\{.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
+            $activityFocusedApp = Normalize-Component $matches[1]
         }
     }
     $currentFocus = ''
-    $focusedApp = ''
+    $focusedApp = $activityFocusedApp
     foreach ($line in ($window -split '\r?\n')) {
         if (-not $currentFocus -and $line -match 'mCurrentFocus=.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
             $currentFocus = Normalize-Component $matches[1]
@@ -112,6 +115,13 @@ function Read-ForegroundState {
         if (-not $focusedApp -and $line -match 'mFocusedApp=.*?\bu0\s+([A-Za-z0-9._]+/[A-Za-z0-9.$_]+)') {
             $focusedApp = Normalize-Component $matches[1]
         }
+    }
+    # Some Xiaomi Android 11 builds omit mCurrentFocus from dumpsys window while the resumed
+    # ActivityManager record, focused app and matching window are all present. Treat that as a
+    # verified foreground only when all three independent observations agree.
+    if (-not $currentFocus -and $resumed -and $focusedApp -eq $resumed -and
+            $window -match "Window\{.*?\bu0\s+$([regex]::Escape($resumed))\}") {
+        $currentFocus = $resumed
     }
     return [pscustomobject]@{ Resumed = $resumed; CurrentFocus = $currentFocus; FocusedApp = $focusedApp }
 }

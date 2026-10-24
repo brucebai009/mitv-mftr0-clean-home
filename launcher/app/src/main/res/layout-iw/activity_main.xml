@@ -6,6 +6,14 @@
     android:layout_height="match_parent"
     android:background="#FF000000">
 
+    <!-- Keep wallpaper/video ownership in a pure background container, below all UI. -->
+    <FrameLayout
+        android:id="@+id/backgroundRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:importantForAccessibility="no" />
+
     <!-- Time-of-day backdrop, drawn once a minute (config.xml sky_intensity; 0 keeps it hidden).
          Keep in step with layout/activity_main.xml: every view there must exist here too. -->
     <com.gathin.tvhome.SkyView

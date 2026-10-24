@@ -1,0 +1,218 @@
+[
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_home_settings.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_home_settings.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_pill_text.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/pill_text.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_status_dot.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/status_dot.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/raw_device_profile_mitv_mftr0.json.flat",
+        "source": "com.gathin.tvhome.app-main-12:/raw/device_profile_mitv_mftr0.json"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_item_app.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/item_app.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/xml_input_key_service.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/xml/input_key_service.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/anim_tile_enter_reduced.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/anim/tile_enter_reduced.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_item_card_row.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/item_card_row.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_lock.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_lock.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/mipmap-xhdpi_ic_launcher.jpg.flat",
+        "source": "com.gathin.tvhome.app-main-12:/mipmap-xhdpi/ic_launcher.jpg"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/anim_tile_enter.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/anim/tile_enter.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_pill_text_mid.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/pill_text_mid.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_library_check.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/library_check.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_livetv.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_livetv.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/xml_home_only_accessibility_service.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/xml/home_only_accessibility_service.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_banner_tv.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/banner_tv.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/anim_app_open_enter.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/anim/app_open_enter.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout-iw_item_input.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout-iw/item_input.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_item_input.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/item_input.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_dialog_card_prompt.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/dialog_card_prompt.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/xml_locales_config.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/xml/locales_config.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_picture.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_picture.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_pill_bg.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/pill_bg.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_race_bar.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/race_bar.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_ethernet.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_ethernet.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/font_outfit_light.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/font/outfit_light.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout-iw_dream_clock.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout-iw/dream_clock.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_glass_panel.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/glass_panel.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_input_row_bg.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/input_row_bg.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_input.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_input.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_apps.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_apps.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_settings_choice_bg.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/settings_choice_bg.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout-iw_activity_main.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout-iw/activity_main.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_dream_clock.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/dream_clock.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/font_outfit.ttf.flat",
+        "source": "com.gathin.tvhome.app-main-12:/font/outfit.ttf"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_tile_bg.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/tile_bg.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_swap_vert.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_swap_vert.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/font_outfit_extralight.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/font/outfit_extralight.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/xml_home_key_service.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/xml/home_key_service.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/raw_keep.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/raw/keep.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable-nodpi_banner.jpg.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable-nodpi/banner.jpg"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_row_app_library.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/row_app_library.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_pill_text_dim.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/pill_text_dim.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/font_outfit_medium.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/font/outfit_medium.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/font_outfit_regular.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/font/outfit_regular.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_activity_main.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_activity_launcher_settings.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/activity_launcher_settings.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_wifi.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_wifi.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_av.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_av.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/drawable_ic_settings.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/drawable/ic_settings.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_activity_quick_settings.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/activity_quick_settings.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/anim_app_open_exit.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/anim/app_open_exit.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_popup_cards.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/popup_cards.xml"
+    },
+    {
+        "merged": "com.gathin.tvhome.app-debug-10:/layout_popup_inputs.xml.flat",
+        "source": "com.gathin.tvhome.app-main-12:/layout/popup_inputs.xml"
+    }
+]

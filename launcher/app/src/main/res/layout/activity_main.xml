@@ -5,6 +5,14 @@
     android:layout_height="match_parent"
     android:background="#FF000000">
 
+    <!-- All image/video/shade layers are owned here; UI and focus remain above this container. -->
+    <FrameLayout
+        android:id="@+id/backgroundRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:importantForAccessibility="no" />
+
     <!-- Time-of-day backdrop, drawn once a minute (config.xml sky_intensity; 0 keeps it hidden). -->
     <com.gathin.tvhome.SkyView
         android:id="@+id/sky"
@@ -309,7 +317,7 @@
                 <TextClock
                     android:id="@+id/appleTime"
                     android:layout_width="wrap_content"
-                    android:layout_height="42dp"
+                    android:layout_height="36dp"
                     android:layout_marginStart="10dp"
                     android:gravity="center"
                     android:format12Hour="h:mm a"
@@ -322,19 +330,19 @@
 
                 <TextView
                     android:id="@+id/btnInputs"
-                    style="@style/TopButton"
-                    android:text="@string/inputs"
-                    android:drawableStart="@drawable/ic_input"
+                    style="@style/CompactTopIcon"
+                    android:contentDescription="@string/inputs"
+                    android:drawableStart="@drawable/ic_top_input"
                     android:nextFocusDown="@+id/grid" />
 
                 <TextView
                     android:id="@+id/btnWifi"
-                    style="@style/TopButton"
+                    style="@style/CompactTopIcon"
                     android:maxWidth="180dp"
                     android:singleLine="true"
                     android:ellipsize="end"
-                    android:text="@string/wifi"
-                    android:drawableStart="@drawable/ic_wifi"
+                    android:contentDescription="@string/wifi"
+                    android:drawableStart="@drawable/ic_top_wifi"
                     android:nextFocusDown="@+id/grid" />
 
                 <TextView
@@ -346,9 +354,9 @@
 
                 <TextView
                     android:id="@+id/btnSettings"
-                    style="@style/TopButton"
-                    android:text="@string/settings"
-                    android:drawableStart="@drawable/ic_settings"
+                    style="@style/CompactTopIcon"
+                    android:contentDescription="@string/settings"
+                    android:drawableStart="@drawable/ic_top_settings"
                     android:nextFocusDown="@+id/grid" />
             </LinearLayout>
         </RelativeLayout>
@@ -374,7 +382,7 @@
         </FrameLayout>
     </LinearLayout>
 
-    <!-- The single floating glass highlight that springs between tiles. -->
+    <!-- The focus outline anchored to the rendered focused tile. -->
     <com.gathin.tvhome.GlassView
         android:id="@+id/glass"
         android:layout_width="10dp"

@@ -14,6 +14,7 @@
          FINE" rule does not apply here. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:ignore="CoarseFineLocation" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
          apps that declare a module card (docs/specs/card.md). -->
@@ -37,7 +38,7 @@
     </queries>
 
     <application
-        android:label="@string/app_name"
+        android:label="@string/launcher_identity_label"
         android:icon="@mipmap/ic_launcher"
         android:banner="@drawable/banner"
         android:theme="@style/Theme.TvHome"
@@ -58,7 +59,12 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <!-- Listed in the TV's own app list, so it can be opened from the stock home screen too. -->
+            <!-- China-market stock app lists may query LAUNCHER instead of LEANBACK_LAUNCHER.
+                 Keep HOME and app-list filters separate; the launcher remains one component. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
@@ -115,6 +121,18 @@
                 android:resource="@xml/home_only_accessibility_service" />
         </service>
 
+        <!-- One-shot, opt-in boot handoff. It only runs when the user-enabled Home helper is still enabled. -->
+        <receiver
+            android:name=".HomeBootReceiver"
+            android:directBootAware="false"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <!-- Screensaver: pick it in Settings, or `settings put secure screensaver_components
              com.gathin.tvhome/.ClockDream` over adb. -->
         <service
@@ -133,6 +151,13 @@
         <provider
             android:name=".ThemeProvider"
             android:authorities="${applicationId}.theme"
+            android:exported="true"
+            android:permission="android.permission.WRITE_SECURE_SETTINGS" />
+
+        <!-- Explicit, shell-only transfer from the original ID to a fresh compatibility installation. -->
+        <provider
+            android:name=".LauncherTransferProvider"
+            android:authorities="${applicationId}.transfer"
             android:exported="true"
             android:permission="android.permission.WRITE_SECURE_SETTINGS" />
 

@@ -23,6 +23,13 @@ def test_restore_script_reads_snapshot_and_verifies_home_readback():
     assert "LASTEXITCODE" in text
 
 
+def test_foreground_readback_accepts_xiaomi_activity_focus_fallback():
+    text = (ROOT / "Install-TVHome.ps1").read_text(encoding="utf-8")
+    assert "mFocusedApp=ActivityRecord" in text
+    assert "activityFocusedApp" in text
+    assert "Window\\{.*?\\bu0\\s+" in text
+
+
 def test_wallpaper_import_script_uses_safe_provider_name_and_literal_path():
     text = (ROOT / "Import-Wallpaper.ps1").read_text(encoding="utf-8")
     assert "[Parameter(Mandatory=$true)][string]$ImagePath" in text

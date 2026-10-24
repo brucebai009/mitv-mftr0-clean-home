@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.gathin.tvhome.LibraryAppsTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-22T04:55:23" hostname="DESKTOP-1O2Q5KA" time="0.003">
+  <properties/>
+  <testcase name="duplicateAndMalformedRecordsAreRejected" classname="com.gathin.tvhome.LibraryAppsTest" time="0.001"/>
+  <testcase name="staleFocusIsClampedAfterAnAppRemoval" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="themeAndTvDefaultsStayInPlaceUntilTheOwnerChoosesAnApp" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="addingAdvancesPastCheckedAppsToTheNextMissingShortcut" classname="com.gathin.tvhome.LibraryAppsTest" time="0.001"/>
+  <testcase name="recentMeansFirstInstalledWithinSevenDaysAndNotAnUnknownOrFutureDate" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="addingTheLastMissingShortcutKeepsANearbyCardInsteadOfJumpingToTheStart" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="missingShortcutsComeBeforeHomeAppsEvenWhenTheHomeAppIsNewer" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="undoingAnAdditionRestoresDefaultVisibilityAndKeepsOtherChoices" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="aFullListAllowsRemovalAndAnExistingChoiceButNotAnotherApp" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="choicesRoundTripInStableOrderIncludingAnEmptyList" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="recentMissingAppsComeFirstButOlderAppsAndHomeAppsUseLabelOrder" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <testcase name="removingAnyHomeAppOverridesThemeDefaultsAndPreviousAdditions" classname="com.gathin.tvhome.LibraryAppsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

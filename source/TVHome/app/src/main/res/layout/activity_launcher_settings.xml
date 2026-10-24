@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settingsRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <ImageView
+        android:id="@+id/settingsBackdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:importantForAccessibility="no" />
+
+    <View
+        android:id="@+id/settingsScrim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66000000"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingStart="36dp"
+        android:paddingEnd="36dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:id="@+id/settingsCategories"
+            android:layout_width="176dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingEnd="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="设置"
+                android:textColor="#FFFFFFFF"
+                android:textSize="26sp"
+                android:fontFamily="@font/outfit_medium" />
+
+            <TextView android:id="@+id/settingsCategoryAppearance" style="@style/SettingsCategory" android:text="外观与壁纸" />
+            <TextView android:id="@+id/settingsCategoryApps" style="@style/SettingsCategory" android:text="应用与Dock" />
+            <TextView android:id="@+id/settingsCategoryMotion" style="@style/SettingsCategory" android:text="动效与性能" />
+            <TextView android:id="@+id/settingsCategorySource" style="@style/SettingsCategory" android:text="信号源" />
+            <TextView android:id="@+id/settingsCategoryDesktop" style="@style/SettingsCategory" android:text="桌面与遥控" />
+            <TextView android:id="@+id/settingsCategorySystem" style="@style/SettingsCategory" android:text="屏保与系统" />
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/settingsContentScroll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:background="@android:color/transparent"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:id="@+id/settingsContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="38dp">
+
+                <TextView
+                    android:id="@+id/sectionAppearance"
+                    style="@style/SettingsSection"
+                    android:text="外观与壁纸" />
+                <TextView android:id="@+id/wallpaperChoice" style="@style/SettingsRow" />
+                <TextView android:id="@+id/wallpaperDimChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" />
+                <TextView android:id="@+id/glassBlurChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="设置背景模糊" />
+                <TextView android:id="@+id/videoWallpaperChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" />
+                <TextView android:id="@+id/followThemeChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="恢复默认背景" />
+
+                <TextView android:id="@+id/sectionApps" style="@style/SettingsSection" android:layout_marginTop="24dp" android:text="应用与Dock" />
+                <TextView android:id="@+id/columnsLabel" style="@style/SettingsHint" android:text="每行应用数量" />
+                <LinearLayout android:id="@+id/columnsRow" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
+                    <TextView android:id="@+id/columns4" style="@style/SettingsColumnChoice" android:text="4" />
+                    <TextView android:id="@+id/columns5" style="@style/SettingsColumnChoice" android:text="5" />
+                    <TextView android:id="@+id/columns6" style="@style/SettingsColumnChoice" android:text="6" />
+                    <TextView android:id="@+id/columns7" style="@style/SettingsColumnChoice" android:text="7" />
+                </LinearLayout>
+                <TextView android:id="@+id/rowsLabel" style="@style/SettingsHint" android:layout_marginTop="12dp" android:text="首页应用行数" />
+                <LinearLayout android:id="@+id/rowsRow" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
+                    <TextView android:id="@+id/rows0" style="@style/SettingsColumnChoice" android:text="0" />
+                    <TextView android:id="@+id/rows1" style="@style/SettingsColumnChoice" android:text="1" />
+                    <TextView android:id="@+id/rows2" style="@style/SettingsColumnChoice" android:text="2" />
+                    <TextView android:id="@+id/rows3" style="@style/SettingsColumnChoice" android:text="3" />
+                </LinearLayout>
+                <TextView android:id="@+id/homeAppsChoice" style="@style/SettingsRow" android:layout_marginTop="12dp" android:text="全部应用" />
+
+                <TextView android:id="@+id/sectionMotion" style="@style/SettingsSection" android:layout_marginTop="24dp" android:text="动效与性能" />
+                <TextView android:id="@+id/animationsChoice" style="@style/SettingsRow" />
+                <TextView android:id="@+id/advancedChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" />
+                <TextView android:id="@+id/reducedMotionChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="减少动态效果" />
+                <TextView android:id="@+id/staticCoverChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="使用静态封面" />
+
+                <TextView android:id="@+id/sectionSource" style="@style/SettingsSection" android:layout_marginTop="24dp" android:text="信号源" />
+                <TextView android:id="@+id/homeSignalSourceChoice" style="@style/SettingsRow" android:text="信号源与预览" />
+
+                <TextView android:id="@+id/sectionDesktop" style="@style/SettingsSection" android:layout_marginTop="24dp" android:text="桌面与遥控" />
+                <TextView android:id="@+id/defaultHomeChoice" style="@style/SettingsRow" android:text="默认桌面" />
+                <TextView android:id="@+id/homeHelperChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" />
+                <TextView android:id="@+id/homeNormalBehavior" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="返回小米桌面" />
+
+                <TextView android:id="@+id/sectionSystem" style="@style/SettingsSection" android:layout_marginTop="24dp" android:text="屏保与系统" />
+                <TextView android:id="@+id/homeScreensaverChoice" style="@style/SettingsRow" android:text="屏保" />
+                <TextView android:id="@+id/tvSettingsChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="打开小米系统设置" />
+                <TextView android:id="@+id/homeWifiChoice" style="@style/SettingsRow" android:layout_marginTop="10dp" android:text="打开 Wi-Fi 设置" />
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</FrameLayout>

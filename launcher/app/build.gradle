@@ -11,8 +11,11 @@ android {
         applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
         minSdk 26
         targetSdk 34
-        versionCode 9
-        versionName '1.0.0-v13.2'
+        versionCode 13
+        versionName '1.0.0-v13.6-repair'
+        // Distinct names in the stock app list and a system HOME chooser when both IDs coexist.
+        resValue 'string', 'launcher_identity_label',
+                applicationId == 'com.ts.launcher' ? 'TVHome（兼容版）' : 'TVHome（原版）'
     }
 
     buildTypes {

@@ -196,7 +196,10 @@ final class AppLibraryDialog {
         String cached = labels.get(pkg);
         if (cached != null) return cached;
         String value;
-        try { value = Cards.cleanLabel(String.valueOf(app.loadLabel(activity.getPackageManager())), pkg); }
+        try {
+            String platformLabel = Cards.cleanLabel(String.valueOf(app.loadLabel(activity.getPackageManager())), pkg);
+            value = AppDisplayLabels.forPackage(pkg, platformLabel);
+        }
         catch (RuntimeException unavailable) { value = pkg; }
         labels.put(pkg, value);
         return value;

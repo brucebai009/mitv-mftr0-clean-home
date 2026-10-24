@@ -42,7 +42,7 @@ final class HdmiPreviewProbe {
             listener.onResult(PreviewCapabilityClassifier.Result.NO_ACTIVE_SOURCE);
             return;
         }
-        if (!BackgroundResourceCoordinator.INSTANCE.acquire(BackgroundResourceCoordinator.Owner.PREVIEW)) {
+        if (!BackgroundResourceCoordinator.INSTANCE.acquire(BackgroundResourceCoordinator.Owner.PREVIEW, this)) {
             listener.onResult(PreviewCapabilityClassifier.Result.BLOCKED_VENDOR);
             return;
         }
@@ -72,8 +72,10 @@ final class HdmiPreviewProbe {
             Uri passthrough = TvContract.buildChannelUriForPassthroughInput(inputId);
             tvView.tune(inputId, passthrough);
         } catch (SecurityException denied) {
+            close();
             listener.onResult(PreviewCapabilityClassifier.Result.BLOCKED_PERMISSION);
         } catch (RuntimeException vendorFailure) {
+            close();
             listener.onResult(PreviewCapabilityClassifier.Result.BLOCKED_VENDOR);
         }
     }
@@ -91,6 +93,6 @@ final class HdmiPreviewProbe {
         tvView = null;
         host = null;
         tuned = false;
-        BackgroundResourceCoordinator.INSTANCE.release(BackgroundResourceCoordinator.Owner.PREVIEW);
+        BackgroundResourceCoordinator.INSTANCE.release(this);
     }
 }

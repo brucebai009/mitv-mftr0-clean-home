@@ -50,12 +50,18 @@ final class VideoWallpaperImport {
             if (result != VideoWallpaperPolicy.Result.VALID) throw new IOException("Video rejected: " + result);
             File target = new File(directory, VideoWallpaperPolicy.storageName(sourceName, digest));
             if (target.isFile() && target.length() == temporary.length()) {
-                temporary.delete();
-                return target;
+                // Equal length is not identity: a previously interrupted or corrupted import must
+                // be replaced rather than silently accepted.
+                if (digest.equalsIgnoreCase(sha256(target))) {
+                    temporary.delete();
+                    return target;
+                }
+                if (!target.delete()) throw new IOException("Could not replace invalid video");
             }
+            if (target.isFile() && !target.delete()) throw new IOException("Could not replace existing video");
             if (!temporary.renameTo(target)) throw new IOException("Could not save video");
             // Read back the digest so a partial or altered selection cannot become active.
-            if (!digest.equals(sha256(target))) {
+            if (!digest.equalsIgnoreCase(sha256(target))) {
                 target.delete();
                 throw new IOException("Video hash readback failed");
             }

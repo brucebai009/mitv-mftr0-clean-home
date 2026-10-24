@@ -39,7 +39,7 @@ final class Config {
     static final String WALLPAPER_DIM_KEY = "wallpaper_dim";
     static final int DEFAULT_WALLPAPER_DIM = 30;
     private static final String THEME_REVISION_NAME = "theme_revision";
-    private static final String THEME_SIGNATURE_KEY = "theme_signature";
+    static final String THEME_SIGNATURE_KEY = "theme_signature";
 
     final List<String> dockApps;
     /** Grid apps fill the dock slots dock_apps leaves free (config.xml, fill_dock); on by default, false leaves the slots empty. */
@@ -345,6 +345,12 @@ final class Config {
                     .remove(ROWS_BELOW_DOCK_KEY).remove(WALLPAPER_CHOICE_KEY)
                     .putString(THEME_SIGNATURE_KEY, signature).commit();
         }
+    }
+
+    /** Rebase an imported theme to this installation's file timestamps without resetting choices. */
+    static String themeSignature(File dir) {
+        return fileStamp(dir == null ? null : new File(dir, FILE_NAME)) + ":"
+                + revisionToken(dir == null ? null : new File(dir, THEME_REVISION_NAME));
     }
 
     private static String fileStamp(File file) {

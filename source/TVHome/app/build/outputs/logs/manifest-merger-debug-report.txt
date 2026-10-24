@@ -1,0 +1,354 @@
+-- Merging decision tree log ---
+provider#com.gathin.tvhome.ThemeProvider
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:146:9-150:77
+	android:authorities
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:148:13-57
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:149:13-36
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:150:13-74
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:147:13-42
+provider#com.gathin.tvhome.LauncherTransferProvider
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:153:9-157:77
+	android:authorities
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:155:13-60
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:156:13-36
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:157:13-74
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:154:13-53
+provider#com.gathin.tvhome.RecoveryProvider
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:160:9-164:77
+	android:authorities
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:162:13-60
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:163:13-36
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:164:13-74
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:161:13-45
+manifest
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:2:1-181:12
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:2:1-181:12
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:2:1-181:12
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:2:1-181:12
+MERGED from [androidx.recyclerview:recyclerview:1.3.2] C:\Users\1\.gradle\caches\8.9\transforms\62454a3cca38d4b1256266a06e5b4e28\transformed\recyclerview-1.3.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\f4be888dc301859ee5f0f579bb6b38e7\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\665b1e76a46b4d117d595669e0cc4c46\transformed\customview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\77afff4facff46d9e0ffea40c9ced703\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\70a4404f78ff4408ba72cdeb9a417244\transformed\customview-poolingcontainer-1.0.0\AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.core:core-ktx:1.5.0] C:\Users\1\.gradle\caches\8.9\transforms\9ff1fbd0aec35f5246851cd69fdfa9dd\transformed\core-ktx-1.5.0\AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\67ea28c3055e9d64bcc9ee19a46f8200\transformed\loader-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\1\.gradle\caches\8.9\transforms\d76f7faec08758676fd25dae129ae9e7\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] C:\Users\1\.gradle\caches\8.9\transforms\f1d82a6203e10e6412308c12e4bcd04c\transformed\lifecycle-runtime-2.3.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\9a0b92f9f6b3c890fc34cb4403a07da6\transformed\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\955be4a975cbcd5ce3b32db831311006\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\17976e65923912d1f5a695e89a707860\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\5f37a4f6d9bd8a1c6da483e924d7d2b3\transformed\lifecycle-livedata-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\6aae9ef7e700247fdc9a3e710784986a\transformed\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\1\.gradle\caches\8.9\transforms\d0330487892176a387111f536d1875f8\transformed\core-runtime-2.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\298f772fcc963083d510cf044b5f8bad\transformed\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] C:\Users\1\.gradle\caches\8.9\transforms\cbf874f2032679cdc0e9758f5dc6ada9\transformed\annotation-experimental-1.1.0\AndroidManifest.xml:17:1-24:12
+	package
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:3:5-51
+	android:versionCode
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:2:11-69
+uses-feature#android.software.leanback
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:5:5-87
+	android:required
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:5:60-84
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:5:19-59
+uses-feature#android.hardware.touchscreen
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:6:5-90
+	android:required
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:6:63-87
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:6:19-62
+uses-feature#android.hardware.wifi
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:7:5-83
+	android:required
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:7:56-80
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:7:19-55
+uses-feature#android.hardware.location.gps
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:8:5-91
+	android:required
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:8:64-88
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:8:19-63
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:10:5-79
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:10:22-76
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:11:5-76
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:11:22-73
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:15:5-16:45
+	tools:ignore
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:16:9-42
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:15:22-76
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:17:5-81
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:17:22-78
+queries
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:21:5-38:15
+intent#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:22:9-25:18
+action#android.intent.action.MAIN
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:13-65
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:21-62
+category#android.intent.category.LAUNCHER
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:24:13-73
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:24:23-70
+intent#action:name:android.intent.action.MAIN+category:name:android.intent.category.LEANBACK_LAUNCHER
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:26:9-29:18
+category#android.intent.category.LEANBACK_LAUNCHER
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:28:13-82
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:28:23-79
+intent#action:name:android.intent.action.MAIN+category:name:com.gathin.tvhome.category.DOCK_CARD
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:30:9-33:18
+category#com.gathin.tvhome.category.DOCK_CARD
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:32:13-77
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:32:23-74
+package#com.xiaomi.mitv.settings
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:35:9-60
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:35:18-57
+package#com.mitv.gallery
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:37:9-52
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:37:18-49
+application
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:40:5-180:19
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:40:5-180:19
+MERGED from [androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:24:5-89
+MERGED from [androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:24:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\1\.gradle\caches\8.9\transforms\d76f7faec08758676fd25dae129ae9e7\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\1\.gradle\caches\8.9\transforms\d76f7faec08758676fd25dae129ae9e7\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+	android:extractNativeLibs
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+	android:localeConfig
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:46:9-51
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:24:18-86
+	android:label
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:41:9-41
+	android:icon
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:42:9-43
+	android:allowBackup
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:45:9-36
+	android:banner
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:43:9-42
+	android:theme
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:44:9-44
+activity#com.gathin.tvhome.MainActivity
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:48:9-67:20
+	android:screenOrientation
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:56:13-50
+	android:clearTaskOnLaunch
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:54:13-45
+	android:stateNotNeeded
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:52:13-42
+	android:excludeFromRecents
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:53:13-46
+	android:launchMode
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:51:13-44
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:50:13-36
+	android:configChanges
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:55:13-90
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:49:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.DEFAULT+category:name:android.intent.category.HOME
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:57:13-61:29
+category#android.intent.category.HOME
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:59:17-73
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:59:27-70
+category#android.intent.category.DEFAULT
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:60:17-76
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:60:27-73
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LEANBACK_LAUNCHER
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:63:13-66:29
+activity#com.gathin.tvhome.LauncherSettingsActivity
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:69:9-73:53
+	android:screenOrientation
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:73:13-50
+	android:excludeFromRecents
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:72:13-46
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:71:13-37
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:70:13-53
+activity#com.gathin.tvhome.QuickSettingsActivity
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:75:9-83:86
+	android:screenOrientation
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:82:13-50
+	android:excludeFromRecents
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:80:13-46
+	android:launchMode
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:79:13-43
+	android:noHistory
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:81:13-37
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:77:13-37
+	android:theme
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:83:13-83
+	android:taskAffinity
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:78:13-36
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:76:13-50
+activity#com.gathin.tvhome.HomeSettingsActivity
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:84:9-89:62
+	android:excludeFromRecents
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:88:13-46
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:86:13-37
+	android:theme
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:89:13-59
+	android:taskAffinity
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:87:13-36
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:85:13-49
+service#com.gathin.tvhome.HomeKeyService
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:92:9-103:19
+	android:label
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:94:13-50
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:95:13-36
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:96:13-79
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:93:13-43
+intent-filter#action:name:android.accessibilityservice.AccessibilityService
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:97:13-99:29
+action#android.accessibilityservice.AccessibilityService
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:17-92
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:25-89
+meta-data#android.accessibilityservice
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:100:13-102:60
+	android:resource
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:102:17-57
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:101:17-60
+service#com.gathin.tvhome.HomeOnlyAccessibilityService
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:106:9-117:19
+	android:label
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:108:13-58
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:109:13-36
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:110:13-79
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:107:13-57
+receiver#com.gathin.tvhome.HomeBootReceiver
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:120:9-129:20
+	android:enabled
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:123:13-35
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:124:13-37
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:125:13-75
+	android:directBootAware
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:122:13-44
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:121:13-45
+intent-filter#action:name:android.intent.action.BOOT_COMPLETED
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:126:13-128:29
+action#android.intent.action.BOOT_COMPLETED
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:127:17-79
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:127:25-76
+service#com.gathin.tvhome.ClockDream
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:133:9-142:19
+	android:label
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:135:13-47
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:136:13-36
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:137:13-71
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:134:13-39
+intent-filter#action:name:android.service.dreams.DreamService+category:name:android.intent.category.DEFAULT
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:138:13-141:29
+action#android.service.dreams.DreamService
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:139:17-78
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:139:25-75
+service#com.gathin.tvhome.InputKeyService
+ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:168:9-179:19
+	android:label
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:171:13-45
+	android:exported
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:170:13-37
+	android:permission
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:172:13-79
+	android:name
+		ADDED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:169:13-44
+uses-sdk
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+MERGED from [androidx.recyclerview:recyclerview:1.3.2] C:\Users\1\.gradle\caches\8.9\transforms\62454a3cca38d4b1256266a06e5b4e28\transformed\recyclerview-1.3.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.3.2] C:\Users\1\.gradle\caches\8.9\transforms\62454a3cca38d4b1256266a06e5b4e28\transformed\recyclerview-1.3.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\f4be888dc301859ee5f0f579bb6b38e7\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\f4be888dc301859ee5f0f579bb6b38e7\transformed\dynamicanimation-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\665b1e76a46b4d117d595669e0cc4c46\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\665b1e76a46b4d117d595669e0cc4c46\transformed\customview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\77afff4facff46d9e0ffea40c9ced703\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\77afff4facff46d9e0ffea40c9ced703\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\70a4404f78ff4408ba72cdeb9a417244\transformed\customview-poolingcontainer-1.0.0\AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\70a4404f78ff4408ba72cdeb9a417244\transformed\customview-poolingcontainer-1.0.0\AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.core:core-ktx:1.5.0] C:\Users\1\.gradle\caches\8.9\transforms\9ff1fbd0aec35f5246851cd69fdfa9dd\transformed\core-ktx-1.5.0\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.core:core-ktx:1.5.0] C:\Users\1\.gradle\caches\8.9\transforms\9ff1fbd0aec35f5246851cd69fdfa9dd\transformed\core-ktx-1.5.0\AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\67ea28c3055e9d64bcc9ee19a46f8200\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\67ea28c3055e9d64bcc9ee19a46f8200\transformed\loader-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\1\.gradle\caches\8.9\transforms\d76f7faec08758676fd25dae129ae9e7\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\1\.gradle\caches\8.9\transforms\d76f7faec08758676fd25dae129ae9e7\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] C:\Users\1\.gradle\caches\8.9\transforms\f1d82a6203e10e6412308c12e4bcd04c\transformed\lifecycle-runtime-2.3.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.3.1] C:\Users\1\.gradle\caches\8.9\transforms\f1d82a6203e10e6412308c12e4bcd04c\transformed\lifecycle-runtime-2.3.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\9a0b92f9f6b3c890fc34cb4403a07da6\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\9a0b92f9f6b3c890fc34cb4403a07da6\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\955be4a975cbcd5ce3b32db831311006\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\955be4a975cbcd5ce3b32db831311006\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\17976e65923912d1f5a695e89a707860\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\1\.gradle\caches\8.9\transforms\17976e65923912d1f5a695e89a707860\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\5f37a4f6d9bd8a1c6da483e924d7d2b3\transformed\lifecycle-livedata-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\5f37a4f6d9bd8a1c6da483e924d7d2b3\transformed\lifecycle-livedata-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\6aae9ef7e700247fdc9a3e710784986a\transformed\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\6aae9ef7e700247fdc9a3e710784986a\transformed\lifecycle-livedata-core-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\1\.gradle\caches\8.9\transforms\d0330487892176a387111f536d1875f8\transformed\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.1.0] C:\Users\1\.gradle\caches\8.9\transforms\d0330487892176a387111f536d1875f8\transformed\core-runtime-2.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\298f772fcc963083d510cf044b5f8bad\transformed\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] C:\Users\1\.gradle\caches\8.9\transforms\298f772fcc963083d510cf044b5f8bad\transformed\lifecycle-viewmodel-2.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] C:\Users\1\.gradle\caches\8.9\transforms\cbf874f2032679cdc0e9758f5dc6ada9\transformed\annotation-experimental-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.annotation:annotation-experimental:1.1.0] C:\Users\1\.gradle\caches\8.9\transforms\cbf874f2032679cdc0e9758f5dc6ada9\transformed\annotation-experimental-1.1.0\AndroidManifest.xml:20:5-22:41
+	android:targetSdkVersion
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml

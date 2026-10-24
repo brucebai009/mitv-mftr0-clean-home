@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.gathin.tvhome.PackageMapTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-22T04:55:23" hostname="DESKTOP-1O2Q5KA" time="0.001">
+  <properties/>
+  <testcase name="aValueMayContainAnEqualsSign" classname="com.gathin.tvhome.PackageMapTest" time="0.001"/>
+  <testcase name="anEntryMapsItsPackageToItsAction" classname="com.gathin.tvhome.PackageMapTest" time="0.0"/>
+  <testcase name="entriesWithoutBothHalvesAreSkipped" classname="com.gathin.tvhome.PackageMapTest" time="0.0"/>
+  <testcase name="spacesAroundTheHalvesAreTrimmed" classname="com.gathin.tvhome.PackageMapTest" time="0.0"/>
+  <testcase name="aLaterEntryForAPackageWins" classname="com.gathin.tvhome.PackageMapTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

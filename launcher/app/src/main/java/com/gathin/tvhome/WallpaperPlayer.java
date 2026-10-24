@@ -22,6 +22,8 @@ import java.util.concurrent.Executors;
 /** Displays and rotates a theme's local wallpaper images while Home is visible. */
 final class WallpaperPlayer {
     private final FrameLayout root;
+    /** Pure background container; UI, focus and dialogs stay above this layer. */
+    private final FrameLayout backgroundRoot;
     private final ImageView image;
     private final List<File> files;
     private final long interval;
@@ -40,6 +42,16 @@ final class WallpaperPlayer {
 
     WallpaperPlayer(Context context, FrameLayout root, Config config) {
         this.root = root;
+        FrameLayout existing = root.findViewById(R.id.backgroundRoot);
+        if (existing != null) {
+            backgroundRoot = existing;
+        } else {
+            backgroundRoot = new FrameLayout(context);
+            backgroundRoot.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            root.addView(backgroundRoot, 0, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+        backgroundRoot.setClipChildren(false);
         files = new ArrayList<>(config.wallpapers);
         interval = config.wallpaperRotationMinutes * 60_000L;
         preferences = context.getSharedPreferences("wallpaper_rotation", Context.MODE_PRIVATE);
@@ -50,9 +62,14 @@ final class WallpaperPlayer {
         image = new ImageView(context);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         image.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        boolean imageMode = config.wallpaperEnabled && !files.isEmpty();
+        if ("video".equals(settings.getString("background_mode", "image"))) {
+            File poster = selectedPoster(context);
+            if (poster != null) { files.clear(); files.add(poster); }
+        }
+        boolean imageMode = !files.isEmpty() && (config.wallpaperEnabled
+                || "video".equals(settings.getString("background_mode", "image")));
         if (imageMode) {
-            root.addView(image, 0, new FrameLayout.LayoutParams(
+            backgroundRoot.addView(image, 0, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             showFirst();
         }
@@ -64,7 +81,7 @@ final class WallpaperPlayer {
             View shade = new View(context);
             shade.setBackgroundColor((config.wallpaperDim * 255 / 100) << 24);
             shade.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            root.addView(shade, new FrameLayout.LayoutParams(
+            backgroundRoot.addView(shade, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
     }
@@ -95,6 +112,7 @@ final class WallpaperPlayer {
     }
 
     void start() {
+        if (closed) return;
         active = true;
         if (videoPlayer != null) videoPlayer.start();
         update();
@@ -125,7 +143,7 @@ final class WallpaperPlayer {
         loading = true;
         decoder.execute(() -> {
             Bitmap bitmap = decode(next);
-            root.post(() -> {
+            backgroundRoot.post(() -> {
                 loading = false;
                 if (closed || !active) {
                     if (bitmap != null) bitmap.recycle();
@@ -172,6 +190,7 @@ final class WallpaperPlayer {
     }
 
     private File selectedVideo(Context context) {
+        if (settings.getBoolean("static_cover", false)) return null;
         if (!"video".equals(settings.getString("background_mode", "image"))) return null;
         String path = settings.getString("video_wallpaper_path", "");
         if (path == null || path.isEmpty()) return null;
@@ -179,10 +198,24 @@ final class WallpaperPlayer {
         return file.isFile() && VideoWallpaperPolicy.safeSourceName(file.getName()) ? file : null;
     }
 
+    private File selectedPoster(Context context) {
+        String choice = settings.getString(Config.WALLPAPER_CHOICE_KEY, "");
+        String video = settings.getString("video_wallpaper_path", "");
+        for (WallpaperCandidate candidate : WallpaperCatalog.load(Config.dir(context))) {
+            File source = WallpaperCatalog.resolve(Config.dir(context), candidate.relativeFile);
+            if (candidate.isDynamic() && (candidate.id.equals(choice)
+                    || (source != null && source.getAbsolutePath().equals(video)))) {
+                File poster = WallpaperCatalog.resolve(Config.dir(context), candidate.posterRelativeFile);
+                if (poster != null && poster.isFile()) return poster;
+            }
+        }
+        return null;
+    }
+
     private VideoWallpaperPlayer addVideo(Context context, FrameLayout root, File file) {
         TextureView texture = new TextureView(context);
         texture.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        root.addView(texture, new FrameLayout.LayoutParams(
+        backgroundRoot.addView(texture, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return new VideoWallpaperPlayer(context, texture, file, () -> texture.setVisibility(View.GONE));
     }

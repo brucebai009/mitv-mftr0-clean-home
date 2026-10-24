@@ -1,0 +1,369 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.ts.launcher"
+4    android:versionCode="10"
+5    android:versionName="1.0.0-v13.3-repair" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-feature
+11-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:5:5-87
+12        android:name="android.software.leanback"
+12-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:5:19-59
+13        android:required="false" />
+13-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:5:60-84
+14    <uses-feature
+14-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:6:5-90
+15        android:name="android.hardware.touchscreen"
+15-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:6:19-62
+16        android:required="false" />
+16-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:6:63-87
+17    <uses-feature
+17-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:7:5-83
+18        android:name="android.hardware.wifi"
+18-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:7:19-55
+19        android:required="false" />
+19-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:7:56-80
+20    <uses-feature
+20-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:8:5-91
+21        android:name="android.hardware.location.gps"
+21-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:8:19-63
+22        android:required="false" />
+22-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:8:64-88
+23
+24    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+24-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:10:5-79
+24-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:10:22-76
+25    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+25-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:11:5-76
+25-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:11:22-73
+26    <!--
+27         Needed since Android 10 to read the Wi-Fi network name for the network pill. Never requested at
+28         runtime: build-and-install grants it with pm grant, so lint's Android 12 "ask for COARSE with
+29         FINE" rule does not apply here.
+30    -->
+31    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+31-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:15:5-16:45
+31-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:15:22-76
+32    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+32-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:17:5-81
+32-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:17:22-78
+33
+34    <!--
+35         Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
+36         apps that declare a module card (docs/specs/card.md).
+37    -->
+38    <queries>
+38-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:21:5-38:15
+39        <intent>
+39-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:22:9-25:18
+40            <action android:name="android.intent.action.MAIN" />
+40-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:13-65
+40-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:21-62
+41
+42            <category android:name="android.intent.category.LAUNCHER" />
+42-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:24:13-73
+42-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:24:23-70
+43        </intent>
+44        <intent>
+44-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:26:9-29:18
+45            <action android:name="android.intent.action.MAIN" />
+45-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:13-65
+45-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:21-62
+46
+47            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+47-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:28:13-82
+47-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:28:23-79
+48        </intent>
+49        <intent>
+49-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:30:9-33:18
+50            <action android:name="android.intent.action.MAIN" />
+50-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:13-65
+50-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:21-62
+51
+52            <category android:name="com.gathin.tvhome.category.DOCK_CARD" />
+52-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:32:13-77
+52-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:32:23-74
+53        </intent>
+54        <!-- China-market MIUI TV firmware: the Settings and Wi-Fi pills fall back to Xiaomi's settings app. -->
+55        <package android:name="com.xiaomi.mitv.settings" />
+55-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:35:9-60
+55-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:35:18-57
+56        <!-- The verified Xiaomi profile may expose Gallery only through a regular launcher entry. -->
+57        <package android:name="com.mitv.gallery" />
+57-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:37:9-52
+57-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:37:18-49
+58    </queries>
+59
+60    <application
+60-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:40:5-180:19
+61        android:allowBackup="false"
+61-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:45:9-36
+62        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+62-->[androidx.core:core:1.7.0] C:\Users\1\.gradle\caches\8.9\transforms\3afe7fa58a47c7b182ae0caccac05374\transformed\core-1.7.0\AndroidManifest.xml:24:18-86
+63        android:banner="@drawable/banner"
+63-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:43:9-42
+64        android:extractNativeLibs="false"
+65        android:icon="@mipmap/ic_launcher"
+65-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:42:9-43
+66        android:label="@string/app_name"
+66-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:41:9-41
+67        android:localeConfig="@xml/locales_config"
+67-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:46:9-51
+68        android:theme="@style/Theme.TvHome" >
+68-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:44:9-44
+69        <activity
+69-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:48:9-67:20
+70            android:name="com.gathin.tvhome.MainActivity"
+70-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:49:13-41
+71            android:clearTaskOnLaunch="true"
+71-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:54:13-45
+72            android:configChanges="orientation|screenSize|keyboard|keyboardHidden|uiMode"
+72-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:55:13-90
+73            android:excludeFromRecents="true"
+73-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:53:13-46
+74            android:exported="true"
+74-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:50:13-36
+75            android:launchMode="singleTask"
+75-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:51:13-44
+76            android:screenOrientation="landscape"
+76-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:56:13-50
+77            android:stateNotNeeded="true" >
+77-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:52:13-42
+78            <intent-filter>
+78-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:57:13-61:29
+79                <action android:name="android.intent.action.MAIN" />
+79-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:13-65
+79-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:21-62
+80
+81                <category android:name="android.intent.category.HOME" />
+81-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:59:17-73
+81-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:59:27-70
+82                <category android:name="android.intent.category.DEFAULT" />
+82-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:60:17-76
+82-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:60:27-73
+83            </intent-filter>
+84            <!-- Listed in the TV's own app list, so it can be opened from the stock home screen too. -->
+85            <intent-filter>
+85-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:63:13-66:29
+86                <action android:name="android.intent.action.MAIN" />
+86-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:13-65
+86-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:23:21-62
+87
+88                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+88-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:28:13-82
+88-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:28:23-79
+89            </intent-filter>
+90        </activity>
+91        <activity
+91-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:69:9-73:53
+92            android:name="com.gathin.tvhome.LauncherSettingsActivity"
+92-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:70:13-53
+93            android:excludeFromRecents="true"
+93-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:72:13-46
+94            android:exported="false"
+94-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:71:13-37
+95            android:screenOrientation="landscape" />
+95-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:73:13-50
+96        <!-- Remote Settings button panel (settings_key_panel); own task so the app behind stays put. -->
+97        <activity
+97-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:75:9-83:86
+98            android:name="com.gathin.tvhome.QuickSettingsActivity"
+98-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:76:13-50
+99            android:excludeFromRecents="true"
+99-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:80:13-46
+100            android:exported="false"
+100-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:77:13-37
+101            android:launchMode="singleTop"
+101-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:79:13-43
+102            android:noHistory="true"
+102-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:81:13-37
+103            android:screenOrientation="landscape"
+103-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:82:13-50
+104            android:taskAffinity=""
+104-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:78:13-36
+105            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+105-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:83:13-83
+106        <activity
+106-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:84:9-89:62
+107            android:name="com.gathin.tvhome.HomeSettingsActivity"
+107-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:85:13-49
+108            android:excludeFromRecents="true"
+108-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:88:13-46
+109            android:exported="false"
+109-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:86:13-37
+110            android:taskAffinity=""
+110-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:87:13-36
+111            android:theme="@android:style/Theme.NoDisplay" />
+111-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:89:13-59
+112        <!--
+113             Home button for remotes that send KEYCODE_ALL_APPS (Xiaomi). Opt-in: HOME_KEY_SERVICE=1
+114             build-and-install.sh; see HomeKeyService.
+115        -->
+116        <service
+116-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:92:9-103:19
+117            android:name="com.gathin.tvhome.HomeKeyService"
+117-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:93:13-43
+118            android:exported="true"
+118-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:95:13-36
+119            android:label="@string/home_key_name"
+119-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:94:13-50
+120            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+120-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:96:13-79
+121            <intent-filter>
+121-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:97:13-99:29
+122                <action android:name="android.accessibilityservice.AccessibilityService" />
+122-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:17-92
+122-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:25-89
+123            </intent-filter>
+124
+125            <meta-data
+125-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:100:13-102:60
+126                android:name="android.accessibilityservice"
+126-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:101:17-60
+127                android:resource="@xml/home_key_service" />
+127-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:102:17-57
+128        </service>
+129
+130        <!-- Optional, user-enabled physical-Home-only fallback. It does not read windows or write settings. -->
+131        <service
+131-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:106:9-117:19
+132            android:name="com.gathin.tvhome.HomeOnlyAccessibilityService"
+132-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:107:13-57
+133            android:exported="true"
+133-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:109:13-36
+134            android:label="@string/home_only_helper_name"
+134-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:108:13-58
+135            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+135-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:110:13-79
+136            <intent-filter>
+136-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:97:13-99:29
+137                <action android:name="android.accessibilityservice.AccessibilityService" />
+137-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:17-92
+137-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:25-89
+138            </intent-filter>
+139
+140            <meta-data
+140-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:100:13-102:60
+141                android:name="android.accessibilityservice"
+141-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:101:17-60
+142                android:resource="@xml/home_only_accessibility_service" />
+142-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:102:17-57
+143        </service>
+144
+145        <!-- One-shot, opt-in boot handoff. It only runs when the user-enabled Home helper is still enabled. -->
+146        <receiver
+146-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:120:9-129:20
+147            android:name="com.gathin.tvhome.HomeBootReceiver"
+147-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:121:13-45
+148            android:directBootAware="false"
+148-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:122:13-44
+149            android:enabled="true"
+149-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:123:13-35
+150            android:exported="false"
+150-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:124:13-37
+151            android:permission="android.permission.RECEIVE_BOOT_COMPLETED" >
+151-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:125:13-75
+152            <intent-filter>
+152-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:126:13-128:29
+153                <action android:name="android.intent.action.BOOT_COMPLETED" />
+153-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:127:17-79
+153-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:127:25-76
+154            </intent-filter>
+155        </receiver>
+156
+157        <!--
+158             Screensaver: pick it in Settings, or `settings put secure screensaver_components
+159             com.gathin.tvhome/.ClockDream` over adb.
+160        -->
+161        <service
+161-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:133:9-142:19
+162            android:name="com.gathin.tvhome.ClockDream"
+162-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:134:13-39
+163            android:exported="true"
+163-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:136:13-36
+164            android:label="@string/dream_name"
+164-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:135:13-47
+165            android:permission="android.permission.BIND_DREAM_SERVICE" >
+165-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:137:13-71
+166            <intent-filter>
+166-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:138:13-141:29
+167                <action android:name="android.service.dreams.DreamService" />
+167-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:139:17-78
+167-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:139:25-75
+168
+169                <category android:name="android.intent.category.DEFAULT" />
+169-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:60:17-76
+169-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:60:27-73
+170            </intent-filter>
+171        </service>
+172
+173        <!--
+174             tools/theme.sh writes the theme through this where the shell can't reach Android/data;
+175             see ThemeProvider. WRITE_SECURE_SETTINGS: the adb shell has it, ordinary apps don't.
+176        -->
+177        <provider
+178            android:name="com.gathin.tvhome.ThemeProvider"
+178-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:147:13-42
+179            android:authorities="com.ts.launcher.theme"
+179-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:148:13-57
+180            android:exported="true"
+180-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:149:13-36
+181            android:permission="android.permission.WRITE_SECURE_SETTINGS" />
+181-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:150:13-74
+182
+183        <!-- Explicit, shell-only transfer from the original ID to a fresh compatibility installation. -->
+184        <provider
+185            android:name="com.gathin.tvhome.LauncherTransferProvider"
+185-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:154:13-53
+186            android:authorities="com.ts.launcher.transfer"
+186-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:155:13-60
+187            android:exported="true"
+187-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:156:13-36
+188            android:permission="android.permission.WRITE_SECURE_SETTINGS" />
+188-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:157:13-74
+189
+190        <!-- Installer recovery bridge: only TVHome-owned helper/boot/reset flags are accepted. -->
+191        <provider
+192            android:name="com.gathin.tvhome.RecoveryProvider"
+192-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:161:13-45
+193            android:authorities="com.ts.launcher.recovery"
+193-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:162:13-60
+194            android:exported="true"
+194-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:163:13-36
+195            android:permission="android.permission.WRITE_SECURE_SETTINGS" />
+195-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:164:13-74
+196
+197        <!--
+198         The remote's Input button (KEYCODE_TV or KEYCODE_TV_INPUT) opens the input switcher, and input_key_keycodes and
+199         app_keys (config.xml or a theme) bring back other remote buttons; see InputKeyService.
+200        -->
+201        <service
+201-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:168:9-179:19
+202            android:name="com.gathin.tvhome.InputKeyService"
+202-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:169:13-44
+203            android:exported="false"
+203-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:170:13-37
+204            android:label="@string/app_name"
+204-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:171:13-45
+205            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+205-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:172:13-79
+206            <intent-filter>
+206-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:97:13-99:29
+207                <action android:name="android.accessibilityservice.AccessibilityService" />
+207-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:17-92
+207-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:98:25-89
+208            </intent-filter>
+209
+210            <meta-data
+210-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:100:13-102:60
+211                android:name="android.accessibilityservice"
+211-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:101:17-60
+212                android:resource="@xml/input_key_service" />
+212-->E:\MiTV-CleanYourTV\repo\launcher\app\src\main\AndroidManifest.xml:102:17-57
+213        </service>
+214    </application>
+215
+216</manifest>

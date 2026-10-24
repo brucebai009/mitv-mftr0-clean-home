@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.gathin.tvhome.VideoWallpaperPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-22T06:23:09" hostname="DESKTOP-1O2Q5KA" time="0.001">
+  <properties/>
+  <testcase name="acceptsConstrainedSilentH264Video" classname="com.gathin.tvhome.VideoWallpaperPolicyTest" time="0.001"/>
+  <testcase name="safeStorageNameIsStableAndDoesNotAcceptPaths" classname="com.gathin.tvhome.VideoWallpaperPolicyTest" time="0.0"/>
+  <testcase name="rejectsNonMp4UnsafeNameAndNonSdr" classname="com.gathin.tvhome.VideoWallpaperPolicyTest" time="0.0"/>
+  <testcase name="rejectsOversizedLongFastOrNonH264Video" classname="com.gathin.tvhome.VideoWallpaperPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

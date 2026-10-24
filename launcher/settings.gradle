@@ -22,3 +22,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "tvhome"
 include ':app'
+
+include ':entry'
