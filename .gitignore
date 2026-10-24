@@ -14,3 +14,10 @@ backup/
 *.aab
 launcher/hs_err_pid*.log
 launcher/replay_pid*.log
+
+# The public source mirror is a clean copy of launcher; never publish local
+# Gradle state or device-specific SDK paths from that mirror.
+source/TVHome/.gradle/
+source/TVHome/build/
+source/TVHome/app/build/
+source/TVHome/local.properties
