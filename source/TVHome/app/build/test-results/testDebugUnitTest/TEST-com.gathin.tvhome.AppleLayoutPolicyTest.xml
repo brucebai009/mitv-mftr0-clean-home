@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.gathin.tvhome.AppleLayoutPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-22T06:23:09" hostname="DESKTOP-1O2Q5KA" time="0.006">
-  <properties/>
-  <testcase name="dockUsesTheAlreadyInsetSafeRect" classname="com.gathin.tvhome.AppleLayoutPolicyTest" time="0.005"/>
-  <testcase name="supportedColumnChoicesMatchSettings" classname="com.gathin.tvhome.AppleLayoutPolicyTest" time="0.0"/>
-  <testcase name="cardsAreSixteenByTen" classname="com.gathin.tvhome.AppleLayoutPolicyTest" time="0.0"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
