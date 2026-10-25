@@ -41,4 +41,21 @@ public class IconCardArtworkTest {
         cache.invalidatePrefix("com.b/.Main");
         assertFalse(cache.containsKeyForTest("com.b/.Main|1|192|108|1"));
     }
+
+    @Test public void fallbackIconLayoutIsCenteredOnCardAndClearsLegacyOffset() {
+        IconCardArtwork.FallbackLayout layout = IconCardArtwork.fallbackLayout(180, 113);
+        assertEquals(62, layout.width);
+        assertEquals(62, layout.height);
+        assertEquals(17, layout.gravity);
+        assertTrue(layout.fitCenter);
+        assertEquals(0, layout.topMargin);
+        assertEquals(0, layout.bottomMargin);
+        assertEquals(0, layout.leftMargin);
+        assertEquals(0, layout.rightMargin);
+        assertEquals(0, layout.marginStart);
+        assertEquals(0, layout.marginEnd);
+        assertEquals(0f, layout.translationX, 0f);
+        assertEquals(0f, layout.translationY, 0f);
+        assertEquals(0, layout.padding);
+    }
 }

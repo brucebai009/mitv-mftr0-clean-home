@@ -25,6 +25,8 @@ import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
+import android.view.Gravity;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -484,6 +486,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             h.banner.setImageDrawable(null);
             h.iconBackground.setImageDrawable(null);
             h.icon.setImageDrawable(null);
+            restoreIconLayout(h, ctx.getResources().getDisplayMetrics().density);
             h.card.setOnClickListener(null);
             h.card.setOnLongClickListener(null);
             return;
@@ -506,6 +509,7 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         // nothing on every frame; keep it under banners with transparent parts and under icon tiles.
         h.card.setBackground(e.banner != null && e.banner.getOpacity() == PixelFormat.OPAQUE ? null : h.cardBackground);
         if (e.banner != null) {
+            restoreIconLayout(h, ctx.getResources().getDisplayMetrics().density);
             h.banner.setImageDrawable(e.banner);
             h.banner.setVisibility(View.VISIBLE);
             h.iconBackground.setImageDrawable(null);
@@ -521,15 +525,9 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             h.icon.setVisibility(View.VISIBLE);
             // The outer focused name remains the single label; do not duplicate it in the card.
             h.label.setVisibility(View.GONE);
-            ViewGroup.LayoutParams iconLp = h.icon.getLayoutParams();
             int cardWidth = h.card.getLayoutParams() == null ? 0 : h.card.getLayoutParams().width;
             int cardHeight = h.card.getLayoutParams() == null ? 0 : h.card.getLayoutParams().height;
-            if (cardWidth > 0 && cardHeight > 0) {
-                int iconSize = Math.max(1, Math.round(cardHeight * 0.55f));
-                iconLp.width = Math.min(iconSize, Math.round(cardWidth * 0.65f));
-                iconLp.height = iconSize;
-                h.icon.setLayoutParams(iconLp);
-            }
+            applyFallbackIconLayout(h, cardWidth, cardHeight);
             final long token = bindToken;
             int lowWidth = 192;
             int lowHeight = Math.max(1, cardWidth > 0 && cardHeight > 0
@@ -552,6 +550,50 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
             return true;
         });
+    }
+
+    /** The icon is centered inside the long card only; the outer item also owns the name below the card. */
+    private static void applyFallbackIconLayout(Holder h, int cardWidth, int cardHeight) {
+        IconCardArtwork.FallbackLayout spec = IconCardArtwork.fallbackLayout(cardWidth, cardHeight);
+        ViewGroup.LayoutParams raw = h.icon.getLayoutParams();
+        if (raw instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) raw;
+            lp.width = spec.width;
+            lp.height = spec.height;
+            lp.gravity = Gravity.CENTER;
+            lp.setMargins(0, 0, 0, 0);
+            lp.setMarginStart(0);
+            lp.setMarginEnd(0);
+            h.icon.setLayoutParams(lp);
+        } else {
+            raw.width = spec.width;
+            raw.height = spec.height;
+            h.icon.setLayoutParams(raw);
+        }
+        h.icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        h.icon.setTranslationX(spec.translationX);
+        h.icon.setTranslationY(spec.translationY);
+        h.icon.setPadding(spec.padding, spec.padding, spec.padding, spec.padding);
+    }
+
+    /** Re-establishes the XML contract before a recycled holder is used for a banner or empty tile. */
+    private static void restoreIconLayout(Holder h, float density) {
+        ViewGroup.LayoutParams raw = h.icon.getLayoutParams();
+        if (raw instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) raw;
+            lp.width = Math.round(48 * density);
+            lp.height = Math.round(48 * density);
+            lp.gravity = Gravity.CENTER;
+            int bottom = Math.round(14 * density);
+            lp.setMargins(0, 0, 0, bottom);
+            lp.setMarginStart(0);
+            lp.setMarginEnd(0);
+            h.icon.setLayoutParams(lp);
+        }
+        h.icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        h.icon.setTranslationX(0f);
+        h.icon.setTranslationY(0f);
+        h.icon.setPadding(0, 0, 0, 0);
     }
 
     @Override

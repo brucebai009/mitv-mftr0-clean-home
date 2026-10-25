@@ -34,6 +34,41 @@ public final class IconCardArtwork {
         return width <= 0 || height <= 0 || width < height * 1.4f;
     }
 
+    /**
+     * Layout contract for a no-banner icon. It is deliberately pure data so the binding contract can be
+     * checked without inflating a TV view: the card is the reference rectangle, never the label below it.
+     */
+    public static final class FallbackLayout {
+        public final int width, height, gravity;
+        public final boolean fitCenter;
+        public final int topMargin, bottomMargin, leftMargin, rightMargin, marginStart, marginEnd;
+        public final float translationX, translationY;
+        public final int padding;
+
+        private FallbackLayout(int width, int height) {
+            this.width = width;
+            this.height = height;
+            this.gravity = 17; // android.view.Gravity.CENTER
+            this.fitCenter = true;
+            this.topMargin = 0;
+            this.bottomMargin = 0;
+            this.leftMargin = 0;
+            this.rightMargin = 0;
+            this.marginStart = 0;
+            this.marginEnd = 0;
+            this.translationX = 0f;
+            this.translationY = 0f;
+            this.padding = 0;
+        }
+    }
+
+    public static FallbackLayout fallbackLayout(int cardWidth, int cardHeight) {
+        int safeWidth = Math.max(1, cardWidth);
+        int safeHeight = Math.max(1, cardHeight);
+        int size = Math.max(1, Math.round(safeHeight * 0.55f));
+        return new FallbackLayout(Math.min(size, Math.round(safeWidth * 0.65f)), size);
+    }
+
     /** Returns a stable opaque colour for the low-resolution fill behind an icon. */
     public static int averageOpaqueColor(int[] pixels) {
         if (pixels == null || pixels.length == 0) return 0xFF444444;

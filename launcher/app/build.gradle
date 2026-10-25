@@ -8,7 +8,9 @@ android {
 
     defaultConfig {
         // Opt-in identity for firmware with a package-name HOME allowlist; see docs/devices/xiaomi-mitv-aetp0-dofus.md.
-        applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
+        // Use the compatibility identity only when the build explicitly requests it.
+        // project.findProperty is evaluated by Gradle before the Android DSL provider is finalized.
+        applicationId (project.findProperty('launcherApplicationId') ?: 'com.gathin.tvhome')
         minSdk 26
         targetSdk 34
         versionCode 26
@@ -56,6 +58,8 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     implementation 'androidx.customview:customview:1.0.0'
+    // RecyclerView's pooling-container AAR calls the Kotlin ViewKt extensions at runtime.
+    // Keep the locally verified core-ktx runtime explicit so release shrinking cannot omit it.
     implementation 'androidx.core:core-ktx:1.5.0'
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
     // Test only (never in the APK): plain JVM tests for the module card validators, src/test.
