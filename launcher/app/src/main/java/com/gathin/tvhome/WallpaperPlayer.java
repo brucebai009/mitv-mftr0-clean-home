@@ -14,17 +14,23 @@ import android.widget.ImageView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** Displays and rotates a theme's local wallpaper images while Home is visible. */
-final class WallpaperPlayer {
+final class WallpaperPlayer implements WallpaperPlaylistController.Host {
+    private final Context context;
     private final FrameLayout root;
     /** Pure background container; UI, focus and dialogs stay above this layer. */
     private final FrameLayout backgroundRoot;
     private final ImageView image;
+    private final View dissolveOverlay;
+    private final WallpaperDissolve dissolve;
+    private WallpaperVideoSession visibleSession;
     private final List<File> files;
     private final long interval;
     private final SharedPreferences preferences;
@@ -33,14 +39,18 @@ final class WallpaperPlayer {
     private final int width;
     private final int height;
     private final SharedPreferences settings;
-    private final VideoWallpaperPlayer videoPlayer;
+    private WallpaperVideoSession videoPlayer;
+    private final Map<WallpaperVideoSession, List<View>> playlistViews = new HashMap<>();
+    private final WallpaperPlaylistController playlistController;
     private final boolean videoMode;
     private boolean active;
     private boolean closed;
     private boolean loading;
+    private int playlistPosterGeneration;
     private String displayed = "";
 
     WallpaperPlayer(Context context, FrameLayout root, Config config) {
+        this.context = context.getApplicationContext();
         this.root = root;
         FrameLayout existing = root.findViewById(R.id.backgroundRoot);
         if (existing != null) {
@@ -62,20 +72,41 @@ final class WallpaperPlayer {
         image = new ImageView(context);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         image.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        if ("video".equals(settings.getString("background_mode", "image"))) {
-            File poster = selectedPoster(context);
+        WallpaperPlaylistStore playlistStore = new WallpaperPlaylistStore(context);
+        List<WallpaperCandidate> visibleVideos = WallpaperCatalog.visibleVideos(Config.dir(context));
+        List<String> selectedIds = WallpaperPlaylistPolicy.normalizeSelection(visibleVideos, playlistStore.ids());
+        boolean playlistMode = !settings.getBoolean("static_cover", false)
+                && playlistStore.enabled() && !selectedIds.isEmpty();
+        dissolveOverlay = playlistMode ? new View(context) : null;
+        dissolve = playlistMode ? new WallpaperDissolve(dissolveOverlay,
+                config.animations, config.reducedMotion) : null;
+        if (dissolveOverlay != null) {
+            dissolveOverlay.setFocusable(false); dissolveOverlay.setClickable(false);
+            dissolveOverlay.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+            backgroundRoot.addView(dissolveOverlay, new FrameLayout.LayoutParams(-1, -1));
+        }
+        if ("video".equals(settings.getString("background_mode", "image")) || playlistMode) {
+            File poster = playlistMode ? posterFor(context, visibleVideos, playlistStore.currentId()) : selectedPoster(context);
             if (poster != null) { files.clear(); files.add(poster); }
         }
-        boolean imageMode = !files.isEmpty() && (config.wallpaperEnabled
+        boolean imageMode = !files.isEmpty() && (config.wallpaperEnabled || playlistMode
                 || "video".equals(settings.getString("background_mode", "image")));
         if (imageMode) {
             backgroundRoot.addView(image, 0, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             showFirst();
         }
-        File video = selectedVideo(context);
-        videoMode = video != null;
-        videoPlayer = videoMode ? addVideo(context, root, video) : null;
+        videoMode = playlistMode || selectedVideo(context) != null;
+        if (playlistMode) {
+            playlistController = new WallpaperPlaylistController(context, this, visibleVideos,
+                    settings.getString(Config.WALLPAPER_CHOICE_KEY, ""));
+            videoPlayer = null;
+            if (playlistController.usable()) playlistController.showInitialPoster();
+        } else {
+            playlistController = null;
+            File video = selectedVideo(context);
+            videoPlayer = videoMode ? addVideo(context, root, video) : null;
+        }
         // No shade layer at all when the theme doesn't dim: a full-screen view is overdraw on 1 GB TVs.
         if (config.wallpaperDim > 0 && (imageMode || videoMode)) {
             View shade = new View(context);
@@ -114,20 +145,105 @@ final class WallpaperPlayer {
     void start() {
         if (closed) return;
         active = true;
-        if (videoPlayer != null) videoPlayer.start();
+        if (dissolve != null) dissolve.resume();
+        if (playlistController != null) playlistController.start();
+        else if (videoPlayer != null) videoPlayer.start();
         update();
     }
 
     void stop() {
         active = false;
-        if (videoPlayer != null) videoPlayer.stop();
+        if (dissolve != null) dissolve.pause();
+        if (playlistController != null) playlistController.stop();
+        else if (videoPlayer != null) videoPlayer.stop();
     }
 
     void close() {
         active = false;
         closed = true;
-        if (videoPlayer != null) videoPlayer.close();
+        if (playlistController != null) playlistController.close();
+        else if (videoPlayer != null) videoPlayer.close();
+        if (dissolve != null) dissolve.close();
+        visibleSession = null;
+        playlistViews.clear();
         decoder.shutdownNow();
+    }
+
+    Context context() { return context; }
+    String activeChoice() {
+        return playlistController == null ? "" : playlistController.currentId();
+    }
+    String activePath() {
+        return playlistController == null ? "" : playlistController.currentPath(context);
+    }
+
+    @Override public WallpaperVideoSession createPlaylistVideo(WallpaperCandidate candidate, boolean looping,
+                                                               Runnable completed, Runnable failed) {
+        File file = WallpaperCatalog.resolve(Config.dir(context), candidate.relativeFile);
+        if (file == null || !file.isFile()) return null;
+        WallpaperPlaylistStore.seedFixedBookmark(context, candidate.id, file);
+        WallpaperVideoSession session = addVideo(context, file, candidate.id, looping, completed, failed);
+        visibleSession = session;
+        if (dissolve != null) {
+            dissolve.bind(session, candidate.id);
+            session.setVisualEvents(new WallpaperVideoSession.VisualEvents() {
+                @Override public void approachingEnd() {
+                    if (!closed && active && visibleSession == session) dissolve.fadeOut(session);
+                }
+                @Override public void firstFrame() {
+                    if (closed || !active || visibleSession != session) return;
+                    ++playlistPosterGeneration; // A late poster must never cover the playing video.
+                    image.setVisibility(View.GONE);
+                    new WallpaperPlaylistStore(context).markFirstFrame(android.os.SystemClock.elapsedRealtime());
+                    dissolve.firstFrame(session);
+                }
+            });
+        }
+        return session;
+    }
+
+    @Override public void showPlaylistPoster(WallpaperCandidate candidate) {
+        if (dissolve != null && dissolve.holding()) return;
+        File poster = WallpaperCatalog.resolve(Config.dir(context), candidate.posterRelativeFile);
+        if (poster == null || !poster.isFile()) return;
+        final int token = ++playlistPosterGeneration;
+        decoder.execute(() -> {
+            Bitmap bitmap = decode(poster);
+            backgroundRoot.post(() -> {
+                if (closed || token != playlistPosterGeneration || bitmap == null
+                        || (dissolve != null && dissolve.holding())) {
+                    if (bitmap != null) bitmap.recycle(); return;
+                }
+                image.setImageBitmap(bitmap);
+                image.setVisibility(View.VISIBLE);
+            });
+        });
+    }
+
+    @Override public void removePlaylistVideo(WallpaperVideoSession session) {
+        List<View> views = playlistViews.remove(session);
+        if (views != null) for (View view : views) backgroundRoot.removeView(view);
+    }
+
+    @Override public void preparePlaylistTransition(WallpaperVideoSession old, Runnable readyToRelease) {
+        ++playlistPosterGeneration;
+        if (dissolve == null) readyToRelease.run();
+        else {
+            WallpaperPlaylistStore store = new WallpaperPlaylistStore(context);
+            dissolve.hold(old, store.advanceCount(), store.currentId(), store.lastReason(),
+                    store.completedAt(), readyToRelease);
+        }
+    }
+
+    @Override public void onPlaylistSuspended() {
+        if (dissolve != null) dissolve.abort();
+        image.setVisibility(View.VISIBLE);
+    }
+
+    @Override public void onPlaylistBindingChanged() {
+        if (playlistController == null) return;
+        MainActivity.activeWallpaperChoice = playlistController.currentId();
+        MainActivity.activeWallpaperPath = playlistController.currentPath(context);
     }
 
     void update() {
@@ -212,11 +328,64 @@ final class WallpaperPlayer {
         return null;
     }
 
-    private VideoWallpaperPlayer addVideo(Context context, FrameLayout root, File file) {
+    private File posterFor(Context context, List<WallpaperCandidate> candidates, String id) {
+        for (WallpaperCandidate candidate : candidates) {
+            if (candidate.id.equals(id)) {
+                File poster = WallpaperCatalog.resolve(Config.dir(context), candidate.posterRelativeFile);
+                if (poster != null && poster.isFile()) return poster;
+            }
+        }
+        return candidates.isEmpty() ? null : WallpaperCatalog.resolve(Config.dir(context), candidates.get(0).posterRelativeFile);
+    }
+
+    private WallpaperVideoSession addVideo(Context context, FrameLayout root, File file) {
+        return addVideo(context, file, "", true, null, null);
+    }
+
+    private WallpaperVideoSession addVideo(Context context, File file, String playlistId,
+                                           boolean looping, Runnable completed, Runnable failed) {
+        for (WallpaperCandidate candidate : WallpaperCatalog.load(Config.dir(context))) {
+            File source = WallpaperCatalog.resolve(Config.dir(context), candidate.relativeFile);
+            if (source != null && source.equals(file) && VideoWallpaperPolicy.needsNativeSurface(
+                    candidate.width, candidate.height, candidate.fps, file.length())) {
+                android.view.SurfaceView surface = new android.view.SurfaceView(context);
+                surface.setContentDescription("TVHome UHD wallpaper surface");
+                surface.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
+                backgroundRoot.addView(surface, 0, new FrameLayout.LayoutParams(-1, -1));
+                // Cover is above the SurfaceView hole, below the Dock and all other UI.
+                if (image.getParent() == null) backgroundRoot.addView(image, 1,
+                        new FrameLayout.LayoutParams(-1, -1));
+                NativeVideoWallpaperPlayer player = new NativeVideoWallpaperPlayer(context, surface, image, file,
+                        looping, completed, playlistId.isEmpty() ? null : WallpaperPlaylistStore.bookmark(context, playlistId, file),
+                        failed);
+                if (!playlistId.isEmpty()) playlistViews.put(player, java.util.Collections.<View>singletonList(surface));
+                return player;
+            }
+        }
         TextureView texture = new TextureView(context);
         texture.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        backgroundRoot.addView(texture, new FrameLayout.LayoutParams(
+        int insertAt = dissolveOverlay == null ? backgroundRoot.getChildCount()
+                : backgroundRoot.indexOfChild(dissolveOverlay);
+        backgroundRoot.addView(texture, insertAt, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-        return new VideoWallpaperPlayer(context, texture, file, () -> texture.setVisibility(View.GONE));
+        VideoWallpaperPlayer.Failure onFailure = failed == null
+                ? () -> texture.setVisibility(View.GONE)
+                : () -> failed.run();
+        VideoWallpaperPlayer player = new VideoWallpaperPlayer(context, texture, file,
+                BackgroundResourceCoordinator.Owner.VIDEO_WALLPAPER,
+                onFailure,
+                looping, completed, playlistId.isEmpty() ? null : WallpaperPlaylistStore.bookmark(context, playlistId, file));
+        if (!playlistId.isEmpty()) {
+            List<View> views = new ArrayList<>();
+            views.add(texture);
+            int index = backgroundRoot.indexOfChild(texture) + 1;
+            while (index < backgroundRoot.getChildCount()) {
+                View child = backgroundRoot.getChildAt(index);
+                if (child instanceof ImageView && child != image && child != dissolveOverlay) { views.add(child); index++; }
+                else break;
+            }
+            playlistViews.put(player, views);
+        }
+        return player;
     }
 }

@@ -17,11 +17,14 @@ final class SerialMediaSession {
         void prepared();
         void size(int width, int height);
         void rendered();
+        void completed();
         void error();
     }
     interface Listener {
+        default void started() { }
         void size(int width, int height);
         void rendered();
+        default void completed() { }
         void failed();
     }
 
@@ -32,7 +35,7 @@ final class SerialMediaSession {
     private final Listener listener;
     private volatile boolean cancelled;
     // Worker-thread state only. Never hold a monitor while invoking the native backend.
-    private boolean released, ownsLease, failed;
+    private boolean released, ownsLease, failed, completed;
     private Backend backend;
 
     SerialMediaSession(Dispatcher worker, BackgroundResourceCoordinator resources,
@@ -47,11 +50,20 @@ final class SerialMediaSession {
     void open() { worker.post(this::openOnWorker); }
 
     void cancel() {
-        cancelled = true;
-        worker.post(this::releaseOnWorker);
+        cancel(null);
     }
 
-    private boolean live() { return !cancelled && !released && !failed; }
+    void cancel(Runnable afterRelease) {
+        cancelled = true;
+        // Register and invoke the continuation on the same worker that owns release. A decoder
+        // may already have released after failure; that must not swallow the next-source callback.
+        worker.post(() -> {
+            try { releaseOnWorker(); }
+            finally { if (afterRelease != null) afterRelease.run(); }
+        });
+    }
+
+    private boolean live() { return !cancelled && !released && !failed && !completed; }
 
     private void openOnWorker() {
         if (!live()) return;
@@ -63,19 +75,25 @@ final class SerialMediaSession {
             backend.prepare(new Events() {
                 @Override public void prepared() {
                     if (!live()) { releaseOnWorker(); return; }
-                    try { backend.start(); } catch (RuntimeException error) { failOnWorker(); }
+                    try { backend.start(); if (live()) listener.started(); }
+                    catch (RuntimeException error) { failOnWorker(); }
                 }
                 @Override public void size(int width, int height) {
                     if (live()) listener.size(width, height);
                 }
                 @Override public void rendered() { if (live()) listener.rendered(); }
+                @Override public void completed() {
+                    if (!live() || completed) return;
+                    completed = true;
+                    listener.completed();
+                }
                 @Override public void error() { if (live()) failOnWorker(); }
             });
         } catch (Exception error) { failOnWorker(); }
     }
 
     private void failOnWorker() {
-        if (failed || released) return;
+        if (failed || released || completed) return;
         failed = true;
         // Notify first: a blocked release must not delay the poster fallback on the UI thread.
         if (!cancelled) listener.failed();

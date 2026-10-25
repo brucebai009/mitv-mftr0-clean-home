@@ -6,10 +6,11 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-/** Only these three TVHome-owned components can be changed; no caller-supplied package or class. */
+/** Only these fixed TVHome-owned components can be changed; no caller-supplied package or class. */
 final class HelperComponents {
     private static final Class<?>[] TYPES = {
-            HomeOnlyAccessibilityService.class, HomeKeyService.class, HomeBootReceiver.class
+            HomeOnlyAccessibilityService.class, HomeKeyService.class, HomeBootReceiver.class,
+            HomeReturnService.class, HomeReturnBootReceiver.class, HomeReturnRevivalListener.class
     };
     private static final String PREFS = "tvhome_helper_components_backup";
     private HelperComponents() { }
@@ -42,6 +43,7 @@ final class HelperComponents {
         if (!RecoveryState.disarmSynchronously(context)) {
             throw new IllegalStateException("Cannot persist helper-off state");
         }
+        HomeReturnState.setEnabled(context, false);
         boolean accepted = true;
         for (Class<?> type : TYPES) {
             int desired = restore ? saved.getInt(type.getSimpleName(), PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)

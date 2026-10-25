@@ -163,7 +163,7 @@ final class AppLibraryDialog {
                 if (info.activityInfo == null || !info.activityInfo.exported) continue;
                 String pkg = info.activityInfo.packageName;
                 if (Intent.CATEGORY_LEANBACK_LAUNCHER.equals(category)) tvPackages.add(pkg);
-                if (!pkg.equals(activity.getPackageName()) && !unique.containsKey(pkg)) unique.put(pkg, info);
+                if (!LauncherAppVisibility.hidden(pkg, activity.getPackageName()) && !unique.containsKey(pkg)) unique.put(pkg, info);
             }
         }
         totalApps = unique.size();
@@ -196,11 +196,9 @@ final class AppLibraryDialog {
         String cached = labels.get(pkg);
         if (cached != null) return cached;
         String value;
-        try {
-            String platformLabel = Cards.cleanLabel(String.valueOf(app.loadLabel(activity.getPackageManager())), pkg);
-            value = AppDisplayLabels.forPackage(pkg, platformLabel);
-        }
+        try { value = Cards.cleanLabel(String.valueOf(app.loadLabel(activity.getPackageManager())), pkg); }
         catch (RuntimeException unavailable) { value = pkg; }
+        value = AppDisplayLabels.forPackage(pkg, value);
         labels.put(pkg, value);
         return value;
     }
@@ -484,8 +482,10 @@ final class AppLibraryDialog {
             name.setEllipsize(TextUtils.TruncateAt.END);
             TextView status = holder.itemView.findViewById(R.id.status);
             boolean home = onHome.test(pkg);
+            // The manager belongs in the app library; a normal press must not pin it to Home.
+            boolean libraryUtility = "com.elton.tvmanager".equals(pkg);
             boolean recent = LibraryApps.recent(installTimes.getOrDefault(pkg, 0L), catalogTime);
-            status.setText(home ? R.string.library_on_home : recent ? R.string.library_recent : R.string.library_add_home);
+            status.setText(home ? R.string.library_on_home : libraryUtility ? R.string.library_open : recent ? R.string.library_recent : R.string.library_add_home);
             status.setVisibility(View.VISIBLE);
             holder.itemView.setBackground(surface(home ? 0x1475BBA4 : 0x0CFFFFFF, 18));
             View check = holder.itemView.findViewById(R.id.dot);
@@ -495,14 +495,14 @@ final class AppLibraryDialog {
             else check.setBackground(surface(0xFF70D9A0, 8));
             check.setVisibility(home || recent ? View.VISIBLE : View.GONE);
             holder.itemView.setOnClickListener(v -> {
-                if (onHome.test(pkg)) open(app);
+                if (libraryUtility || onHome.test(pkg)) open(app);
                 else changeHome(app, true);
             });
             holder.itemView.setOnLongClickListener(v -> { showActions(app, v); return true; });
             holder.itemView.setOnFocusChangeListener((v, focused) -> {
                 if (focused) {
                     selectedPackage = pkg;
-                    instructions.setText(onHome.test(pkg)
+                    instructions.setText(libraryUtility || onHome.test(pkg)
                             ? R.string.library_hint_open : R.string.library_hint_add);
                     v.post(() -> { if (v.hasFocus() && catalog != null) highlight(v, true); });
                     int index = holder.getBindingAdapterPosition();

@@ -35,9 +35,9 @@ public final class GlassDialog {
         public Builder setItems(String[] values, DialogInterface.OnClickListener listener) { items = values.clone(); onItem = listener; return this; }
         public Builder setSingleChoiceItems(String[] values, int selected, DialogInterface.OnClickListener listener) { items = values.clone(); checked = selected; onItem = listener; singleChoice = true; return this; }
         public Dialog show() {
-            Dialog dialog = new Dialog(activity); dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            Dialog dialog = new FrostedDialog(activity); dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
             LinearLayout card = new LinearLayout(activity); card.setOrientation(LinearLayout.VERTICAL); card.setPadding(dp(24), dp(22), dp(24), dp(20));
-            card.setBackground(new GlassPanelDrawable(activity.getResources().getDisplayMetrics().density, 24));
+            card.setBackground(new GlassPanelDrawable(activity.getResources().getDisplayMetrics().density, 24, true));
             if (title != null && title.length() != 0) card.addView(text(title, 26, false), new LinearLayout.LayoutParams(-1, -2));
             if (message != null && message.length() != 0) { TextView body = text(message, 18, false); body.setTextColor(0xE6FFFFFF); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2); lp.topMargin = dp(14); card.addView(body, lp); }
             View firstFocus = null;

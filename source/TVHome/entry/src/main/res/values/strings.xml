@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">打开自制桌面</string>
-    <string name="opening">正在打开自制桌面…</string>
-    <string name="unavailable">自制桌面暂时无法打开，请检查是否已完成安装。</string>
-    <string name="retry">重试</string>
-    <string name="open_original">打开原版桌面</string>
-    <string name="close">返回</string>
-</resources>

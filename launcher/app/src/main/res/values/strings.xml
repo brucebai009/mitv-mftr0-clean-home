@@ -50,7 +50,7 @@
     <string name="video_wallpaper_choose" translatable="false">选择本地MP4视频</string>
     <string name="video_wallpaper_imported" translatable="false">视频背景已导入</string>
     <string name="video_wallpaper_import_failed" translatable="false">视频不符合限制，已保留原背景</string>
-    <string name="video_wallpaper_hint" translatable="false">建议使用10–30秒、1080p以内的循环视频。背景始终静音。</string>
+    <string name="video_wallpaper_hint" translatable="false">支持原画质 MP4，最高 4K / 60 帧、2 GiB；高规格视频需电视硬件支持。背景始终静音。</string>
     <string name="animations_state">Animations: %1$s</string>
     <string name="advanced_effects">Advanced effects</string>
     <string name="advanced_effects_state">Advanced effects: %1$s</string>
@@ -133,4 +133,17 @@
     <!-- Cinematic top shelf (cinematic_home): the line under the focused dock app's name; %1$s is when it was
          last opened, e.g. "5 minutes ago" or "yesterday, 9:40 pm". -->
     <string name="last_opened">Last opened %1$s</string>
+
+    <string name="dock_editor_title">Edit Home Dock</string>
+    <string name="dock_editor_selected">Pinned apps</string>
+    <string name="dock_editor_available">Installed apps</string>
+    <string name="dock_editor_hint">%1$d selected · %2$d visible slots · Select to add or remove; use arrows to reorder.</string>
+    <string name="dock_editor_empty">Choose an app from the right. The Dock can also stay empty.</string>
+    <string name="dock_editor_cancel">Cancel</string>
+    <string name="dock_editor_save">Save Dock</string>
+    <string name="dock_editor_add">Add to Dock</string>
+    <string name="dock_editor_full">Dock is full. Remove an app first, or increase the number of columns.</string>
+    <string name="dock_editor_move_up">Move %1$s earlier</string>
+    <string name="dock_editor_move_down">Move %1$s later</string>
+    <string name="dock_editor_remove">Remove %1$s from Dock</string>
 </resources>

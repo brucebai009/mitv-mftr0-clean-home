@@ -20,7 +20,7 @@ final class ThemeFiles {
         if (segments.size() == 1) {
             String name = segments.get(0);
             return Config.FILE_NAME.equals(name) || "wallpaper.jpg".equals(name)
-                    || "wallpaper_catalog.json".equals(name) || "theme_revision".equals(name)
+                    || WallpaperCatalog.EXCLUSIONS_NAME.equals(name) || "wallpaper_import.json".equals(name) || "wallpaper_catalog.json".equals(name) || "theme_revision".equals(name)
                     ? name : null;
         }
         if (segments.size() == 2 && WALLPAPERS.equals(segments.get(0)) && collectionImage(segments.get(1))) {

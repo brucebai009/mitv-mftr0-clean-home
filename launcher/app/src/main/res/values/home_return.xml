@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_return_name" translatable="false">TVHome HOME返回</string>
+    <string name="home_return_description" translatable="false">小米首页出现时返回TVHome。检查窗口所属应用，避免打断其他应用或HDMI；不读取界面文字，不拦截遥控器按键。开启恢复后，服务被系统移除时会尝试恢复。可在TVHome设置暂停。可能短暂显示小米桌面。</string>
+    <string name="home_return_revival_name" translatable="false">TVHome HOME服务恢复（不读取通知）</string>
+    <string name="home_return_active" translatable="false">HOME返回已开启 · 辅助模式</string>
+    <string name="home_return_inactive" translatable="false">开启HOME返回</string>
+    <string name="home_return_pause" translatable="false">暂停HOME返回，打开小米桌面</string>
+    <string name="home_return_enable_help" translatable="false">请在辅助功能中启用“TVHome HOME返回”</string>
+    <string name="home_return_paused_help" translatable="false">HOME返回已暂停，请按HOME进入小米桌面。可从“我的应用”重新打开TVHome。</string>
+</resources>

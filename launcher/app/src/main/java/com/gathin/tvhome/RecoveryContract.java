@@ -12,9 +12,12 @@ final class RecoveryContract {
     static final String OP_STATUS = "status";
     static final String OP_DISABLE_HELPERS = "disable_helpers";
     static final String OP_RESTORE_HELPERS = "restore_helpers";
+    static final String OP_HOME_RETURN_ENABLE = "home_return_enable";
+    static final String OP_HOME_RETURN_DISABLE = "home_return_disable";
     private static final Set<String> OPERATIONS = new HashSet<>(Arrays.asList(
             OP_HELPER_ENABLED, OP_BOOT_RECOVERY, OP_RESET_GESTURE,
-            OP_STATUS, OP_DISABLE_HELPERS, OP_RESTORE_HELPERS));
+            OP_STATUS, OP_DISABLE_HELPERS, OP_RESTORE_HELPERS,
+            OP_HOME_RETURN_ENABLE, OP_HOME_RETURN_DISABLE));
 
     private RecoveryContract() { }
 

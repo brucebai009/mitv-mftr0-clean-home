@@ -13,6 +13,8 @@ public class RecoveryContractTest {
         assertTrue(RecoveryContract.isAllowed(RecoveryContract.OP_STATUS));
         assertTrue(RecoveryContract.isAllowed(RecoveryContract.OP_DISABLE_HELPERS));
         assertTrue(RecoveryContract.isAllowed(RecoveryContract.OP_RESTORE_HELPERS));
+        assertTrue(RecoveryContract.isAllowed(RecoveryContract.OP_HOME_RETURN_ENABLE));
+        assertTrue(RecoveryContract.isAllowed(RecoveryContract.OP_HOME_RETURN_DISABLE));
         assertFalse(RecoveryContract.isAllowed("settings_put"));
         assertFalse(RecoveryContract.isAllowed("start_arbitrary_intent"));
         assertFalse(RecoveryContract.isAllowed(""));

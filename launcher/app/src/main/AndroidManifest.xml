@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
         tools:ignore="CoarseFineLocation" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Owner-granted via ADB for this opt-in HOME recovery only. -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
 
     <!-- Android 11+ package visibility: lets the launcher list the TV apps it shows as tiles, and the
          apps that declare a module card (docs/specs/card.md). -->
@@ -50,7 +52,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
-            android:excludeFromRecents="true"
+            android:excludeFromRecents="false"
             android:clearTaskOnLaunch="true"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden|uiMode"
             android:screenOrientation="landscape">
@@ -76,6 +78,11 @@
             android:exported="false"
             android:excludeFromRecents="true"
             android:screenOrientation="landscape" />
+        <activity android:name=".VideoCompatibilityProbeActivity" android:exported="true"
+            android:permission="android.permission.WRITE_SECURE_SETTINGS"
+            android:excludeFromRecents="true" android:screenOrientation="landscape" />
+        <activity android:name=".DockEditorActivity" android:exported="false"
+            android:excludeFromRecents="true" android:screenOrientation="landscape" />
         <!-- Remote Settings button panel (settings_key_panel); own task so the app behind stays put. -->
         <activity
             android:name=".QuickSettingsActivity"
@@ -119,6 +126,31 @@
             <meta-data
                 android:name="android.accessibilityservice"
                 android:resource="@xml/home_only_accessibility_service" />
+        </service>
+
+        <!-- MFTR0 fallback: window ownership checks only; never filters remote keys or reads text. -->
+        <service
+            android:name=".HomeReturnService"
+            android:label="@string/home_return_name"
+            android:enabled="false"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data android:name="android.accessibilityservice"
+                android:resource="@xml/home_return_service" />
+        </service>
+        <receiver android:name=".HomeReturnBootReceiver"
+            android:enabled="false" android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
+        </receiver>
+        <service android:name=".HomeReturnRevivalListener"
+            android:label="@string/home_return_revival_name"
+            android:enabled="false" android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter><action android:name="android.service.notification.NotificationListenerService" /></intent-filter>
         </service>
 
         <!-- One-shot, opt-in boot handoff. It only runs when the user-enabled Home helper is still enabled. -->

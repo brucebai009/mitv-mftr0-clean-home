@@ -1,0 +1,5 @@
+<resources>
+ <item name="dockSaveAction" type="id" />
+ <item name="dockPinnedScroll" type="id" />
+ <item name="dockAvailableScroll" type="id" />
+</resources>

@@ -44,10 +44,12 @@ final class VideoWallpaperImport {
         File temporary = File.createTempFile(".video-", ".part", directory);
         try {
             String digest = copyAndHash(resolver, uri, temporary);
-            VideoInfo info = inspect(temporary);
+            VideoSourceInfo info = VideoSourceInfo.inspect(temporary);
             VideoWallpaperPolicy.Result result = VideoWallpaperPolicy.validate(sourceName, temporary.length(),
-                    info.width, info.height, info.durationMs, info.fps, info.h264, info.sdr);
+                    info.width, info.height, info.durationMs, info.fps, info.mime, info.sdr);
             if (result != VideoWallpaperPolicy.Result.VALID) throw new IOException("Video rejected: " + result);
+            if (info.needsNativeSurface(temporary.length()) && !info.hasHardwareDecoder())
+                throw new IOException("No hardware decoder supports this original video size and frame rate");
             File target = new File(directory, VideoWallpaperPolicy.storageName(sourceName, digest));
             if (target.isFile() && target.length() == temporary.length()) {
                 // Equal length is not identity: a previously interrupted or corrupted import must
@@ -100,6 +102,8 @@ final class VideoWallpaperImport {
             int count;
             while ((count = input.read(buffer)) != -1) {
                 total += count;
+                if (target.getParentFile().getUsableSpace() < 512L * 1024 * 1024 + count)
+                    throw new IOException("Keep at least 512 MiB of free storage");
                 if (total > VideoWallpaperPolicy.MAX_BYTES) throw new IOException("Video file is too large");
                 output.write(buffer, 0, count);
                 digest.update(buffer, 0, count);
@@ -107,34 +111,6 @@ final class VideoWallpaperImport {
         }
         if (total == 0) throw new IOException("Video file is empty");
         return hex(digest.digest());
-    }
-
-    private static VideoInfo inspect(File file) throws IOException {
-        MediaExtractor extractor = new MediaExtractor();
-        try {
-            extractor.setDataSource(file.getPath());
-            for (int i = 0; i < extractor.getTrackCount(); i++) {
-                MediaFormat format = extractor.getTrackFormat(i);
-                String mime = format.containsKey(MediaFormat.KEY_MIME)
-                        ? format.getString(MediaFormat.KEY_MIME) : "";
-                if (!mime.startsWith("video/")) continue;
-                int width = format.containsKey(MediaFormat.KEY_WIDTH) ? format.getInteger(MediaFormat.KEY_WIDTH) : 0;
-                int height = format.containsKey(MediaFormat.KEY_HEIGHT) ? format.getInteger(MediaFormat.KEY_HEIGHT) : 0;
-                long durationUs = format.containsKey(MediaFormat.KEY_DURATION)
-                        ? format.getLong(MediaFormat.KEY_DURATION) : 0L;
-                int fps = format.containsKey(MediaFormat.KEY_FRAME_RATE) ? format.getInteger(MediaFormat.KEY_FRAME_RATE) : 0;
-                boolean sdr = true;
-                if (format.containsKey(MediaFormat.KEY_COLOR_TRANSFER)) {
-                    int transfer = format.getInteger(MediaFormat.KEY_COLOR_TRANSFER);
-                    sdr = transfer != MediaFormat.COLOR_TRANSFER_ST2084
-                            && transfer != MediaFormat.COLOR_TRANSFER_HLG;
-                }
-                return new VideoInfo(width, height, durationUs / 1_000L, fps, "video/avc".equals(mime), sdr);
-            }
-            throw new IOException("No video track");
-        } finally {
-            extractor.release();
-        }
     }
 
     private static String displayName(ContentResolver resolver, Uri uri) {
@@ -153,18 +129,4 @@ final class VideoWallpaperImport {
         return result.toString();
     }
 
-    private static final class VideoInfo {
-        final int width, height, fps;
-        final long durationMs;
-        final boolean h264, sdr;
-
-        VideoInfo(int width, int height, long durationMs, int fps, boolean h264, boolean sdr) {
-            this.width = width;
-            this.height = height;
-            this.durationMs = durationMs;
-            this.fps = fps;
-            this.h264 = h264;
-            this.sdr = sdr;
-        }
-    }
 }

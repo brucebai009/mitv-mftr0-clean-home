@@ -5,6 +5,8 @@ launcher/.gradle/
 launcher/build/
 launcher/app/build/
 launcher/local.properties
+launcher/app/libs/core-ktx-1.5.0-runtime.jar
+launcher/app/src/iconOnlyTest/
 # your own TV's dumps (serial, android_id, device names) stay local
 backup/
 .DS_Store

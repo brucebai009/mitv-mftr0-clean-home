@@ -70,4 +70,17 @@
         <item quantity="other">%1$d 个应用</item>
     </plurals>
     <string name="greeting_with_name">%1$s，%2$s</string>
+
+    <string name="dock_editor_title">编辑首页下栏</string>
+    <string name="dock_editor_selected">已固定应用</string>
+    <string name="dock_editor_available">已安装应用</string>
+    <string name="dock_editor_hint">已选 %1$d 个 · 下栏显示 %2$d 个位置 · 确认添加或移除，箭头调整顺序</string>
+    <string name="dock_editor_empty">从右侧选择应用，也可以保留空下栏。</string>
+    <string name="dock_editor_cancel">取消</string>
+    <string name="dock_editor_save">保存下栏</string>
+    <string name="dock_editor_add">添加到下栏</string>
+    <string name="dock_editor_full">下栏已满，请先移除应用，或在设置中增加列数。</string>
+    <string name="dock_editor_move_up">将 %1$s 前移</string>
+    <string name="dock_editor_move_down">将 %1$s 后移</string>
+    <string name="dock_editor_remove">将 %1$s 移出下栏</string>
 </resources>

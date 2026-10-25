@@ -112,4 +112,16 @@
     <string name="race_live">%1$s · בשידור חי</string>
     <string name="race_finished">הדגל המשובץ</string>
     <string name="last_opened">נפתח לאחרונה %1$s</string>
+    <string name="dock_editor_title">עריכת סרגל היישומים</string>
+    <string name="dock_editor_selected">יישומים מוצמדים</string>
+    <string name="dock_editor_available">יישומים מותקנים</string>
+    <string name="dock_editor_hint">נבחרו %1$d · %2$d מקומות גלויים · אישור להוספה או להסרה, חצים לשינוי הסדר</string>
+    <string name="dock_editor_empty">בחרו יישום מהרשימה. אפשר גם להשאיר את הסרגל ריק.</string>
+    <string name="dock_editor_cancel">ביטול</string>
+    <string name="dock_editor_save">שמירת הסרגל</string>
+    <string name="dock_editor_add">הוספה לסרגל</string>
+    <string name="dock_editor_full">הסרגל מלא. הסירו יישום או הגדילו את מספר העמודות.</string>
+    <string name="dock_editor_move_up">הזזת %1$s קדימה</string>
+    <string name="dock_editor_move_down">הזזת %1$s אחורה</string>
+    <string name="dock_editor_remove">הסרת %1$s מהסרגל</string>
 </resources>

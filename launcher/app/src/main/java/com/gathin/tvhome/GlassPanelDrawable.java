@@ -15,11 +15,15 @@ public final class GlassPanelDrawable extends Drawable {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final RectF rect = new RectF();
     private final float density, radius;
+    private final boolean modal;
     private int alpha = 255;
     private boolean focused, selected;
     private LinearGradient sheen, rim;
 
-    public GlassPanelDrawable(float density, float radiusDp) { this.density = density; radius = radiusDp * density; }
+    public GlassPanelDrawable(float density, float radiusDp) { this(density, radiusDp, false); }
+    public GlassPanelDrawable(float density, float radiusDp, boolean modal) {
+        this.density = density; radius = radiusDp * density; this.modal = modal;
+    }
 
     @Override protected void onBoundsChange(Rect bounds) {
         rect.set(bounds.left + density, bounds.top + density, bounds.right - density, bounds.bottom - density);
@@ -35,7 +39,8 @@ public final class GlassPanelDrawable extends Drawable {
     @Override public void draw(Canvas canvas) {
         if (rect.isEmpty()) return;
         paint.setStyle(Paint.Style.FILL); paint.setShader(null);
-        paint.setColor(selected ? 0x702B435C : 0x57111B28); paint.setAlpha(alpha * (selected ? 112 : 87) / 255);
+        paint.setColor(modal ? 0xFF293039 : selected ? 0x702B435C : 0x57111B28);
+        paint.setAlpha(alpha * (modal ? 218 : selected ? 112 : 87) / 255);
         canvas.drawRoundRect(rect, radius, radius, paint);
         paint.setAlpha(alpha); paint.setShader(sheen); canvas.drawRoundRect(rect, radius, radius, paint);
         paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth((focused ? 1.7f : 0.8f) * density);

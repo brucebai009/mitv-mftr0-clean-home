@@ -4,6 +4,12 @@ package com.gathin.tvhome;
 final class DockViewportPolicy {
     private DockViewportPolicy() { }
 
+    static boolean animateBoundary(boolean dock, int rows, int columns, int from, int to,
+                                   boolean animations, boolean reduced, boolean editing) {
+        return dock && rows == 0 && columns > 0 && from >= 0 && to >= 0
+                && animations && !reduced && !editing && (from < columns) != (to < columns);
+    }
+
     static int offsetFromPadding(int desiredTop, int paddingTop) {
         // LinearLayoutManager offsets are relative to startAfterPadding.
         return desiredTop - paddingTop;

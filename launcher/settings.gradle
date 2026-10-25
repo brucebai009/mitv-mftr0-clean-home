@@ -1,26 +1,9 @@
 pluginManagement {
-    def localMaven = System.getenv('MITV_LOCAL_MAVEN')
-    repositories {
-        if (localMaven && file(localMaven).isDirectory()) {
-            maven { url = uri(localMaven) }
-        }
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    def localMaven = System.getenv('MITV_LOCAL_MAVEN')
-    repositories {
-        if (localMaven && file(localMaven).isDirectory()) {
-            maven { url = uri(localMaven) }
-        }
-        google()
-        mavenCentral()
-    }
+    repositories { google(); mavenCentral() }
 }
 rootProject.name = "tvhome"
-include ':app'
-
-include ':entry'
+include ':app', ':entry'

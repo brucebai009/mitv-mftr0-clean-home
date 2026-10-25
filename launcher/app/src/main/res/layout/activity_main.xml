@@ -13,6 +13,13 @@
         android:clipChildren="false"
         android:importantForAccessibility="no" />
 
+    <!-- Idle animation affects controls only; the UHD SurfaceView remains outside this layer. -->
+    <FrameLayout
+        android:id="@+id/foregroundRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false">
+
     <!-- Time-of-day backdrop, drawn once a minute (config.xml sky_intensity; 0 keeps it hidden). -->
     <com.gathin.tvhome.SkyView
         android:id="@+id/sky"
@@ -34,6 +41,7 @@
     <!-- Ambient glow in the colour of the focused dock app. -->
     <View
         android:id="@+id/ambient"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:alpha="0" />
@@ -389,4 +397,5 @@
         android:layout_height="10dp"
         android:alpha="0"
         android:importantForAccessibility="no" />
+    </FrameLayout>
 </FrameLayout>

@@ -23,10 +23,11 @@ public class SerialMediaSessionTest {
         public void release() { releases++; }
     }
     private static final class Listener implements SerialMediaSession.Listener {
-        int sizes, frames, failures;
+        int sizes, frames, failures, completions;
         public void size(int w, int h) { sizes++; }
         public void rendered() { frames++; }
         public void failed() { failures++; }
+        public void completed() { completions++; }
     }
     private SerialMediaSession session(SerialMediaSession.Dispatcher worker,
             BackgroundResourceCoordinator resources, FakeBackend backend, Listener listener) {
@@ -131,5 +132,40 @@ public class SerialMediaSessionTest {
         session.open(); worker.drain();
         assertEquals(1, backend.releases);
         assertEquals(1, listener.failures);
+    }
+
+    @Test public void completionIsOnceAndDoesNotBecomeFailureOrLateRender() {
+        QueueWorker worker = new QueueWorker(); FakeBackend backend = new FakeBackend();
+        Listener listener = new Listener();
+        SerialMediaSession session = session(worker, new BackgroundResourceCoordinator(), backend, listener);
+        session.open(); worker.drain(); backend.events.prepared();
+        backend.events.completed(); backend.events.completed(); backend.events.error(); backend.events.rendered();
+        assertEquals(1, listener.completions); assertEquals(0, listener.failures); assertEquals(0, listener.frames);
+        session.cancel(); worker.drain(); assertEquals(1, backend.releases);
+    }
+
+    @Test public void continuationRegisteredAfterFailureStillRunsAfterRelease() {
+        QueueWorker worker = new QueueWorker(); FakeBackend backend = new FakeBackend();
+        BackgroundResourceCoordinator resources = new BackgroundResourceCoordinator();
+        SerialMediaSession session = session(worker, resources, backend, new Listener());
+        session.open(); worker.drain(); backend.events.error();
+        int[] calls = {0};
+        session.cancel(() -> {
+            assertEquals(1, backend.releases);
+            assertTrue(resources.acquire(BackgroundResourceCoordinator.Owner.PREVIEW, new Object()));
+            calls[0]++;
+        });
+        assertEquals(0, calls[0]); worker.drain(); assertEquals(1, calls[0]);
+        assertEquals(1, backend.releases);
+    }
+
+    @Test public void repeatedCancelRegistrationsDoNotOverwriteReleaseContinuations() {
+        QueueWorker worker = new QueueWorker(); FakeBackend backend = new FakeBackend();
+        SerialMediaSession session = session(worker, new BackgroundResourceCoordinator(), backend, new Listener());
+        session.open(); worker.drain();
+        int[] calls = {0};
+        session.cancel(() -> { assertEquals(1, backend.releases); calls[0]++; });
+        session.cancel(() -> { assertEquals(1, backend.releases); calls[0]++; });
+        worker.drain(); assertEquals(2, calls[0]); assertEquals(1, backend.releases);
     }
 }

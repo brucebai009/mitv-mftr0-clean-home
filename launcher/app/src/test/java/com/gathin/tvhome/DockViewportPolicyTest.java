@@ -2,6 +2,17 @@ package com.gathin.tvhome;
 
 /** Pixel geometry regression; device focus and rendering still require remote testing. */
 public final class DockViewportPolicyTest {
+    @org.junit.Test public void animateOnlyIntentionalBoundaryNavigation() {
+        for (int columns=4; columns<=7; columns++) {
+            org.junit.Assert.assertTrue(DockViewportPolicy.animateBoundary(true,0,columns,0,columns,true,false,false));
+            org.junit.Assert.assertTrue(DockViewportPolicy.animateBoundary(true,0,columns,columns,0,true,false,false));
+            org.junit.Assert.assertFalse(DockViewportPolicy.animateBoundary(true,0,columns,1,2,true,false,false));
+            org.junit.Assert.assertFalse(DockViewportPolicy.animateBoundary(true,0,columns,columns,columns*2,true,false,false));
+            org.junit.Assert.assertFalse(DockViewportPolicy.animateBoundary(true,0,columns,0,columns,true,true,false));
+            org.junit.Assert.assertFalse(DockViewportPolicy.animateBoundary(true,0,columns,0,columns,false,false,false));
+            org.junit.Assert.assertFalse(DockViewportPolicy.animateBoundary(true,0,columns,0,columns,true,false,true));
+        }
+    }
     private static int checks;
     private static void check(boolean value) {
         checks++;

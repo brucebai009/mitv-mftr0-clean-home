@@ -27,7 +27,10 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,9 +44,10 @@ public final class LauncherSettingsActivity extends Activity {
     private SharedPreferences choices;
     private final TextView[] columnChoices = new TextView[4];
     private final TextView[] rowChoices = new TextView[4];
-    private TextView wallpaperChoice;
     private TextView wallpaperDimChoice;
     private TextView videoWallpaperChoice;
+    private TextView wallpaperPlaylistSwitch;
+    private TextView wallpaperPlaylistChoice;
     private TextView glassBlurChoice;
     private TextView reducedMotionChoice;
     private TextView staticCoverChoice;
@@ -62,6 +66,7 @@ public final class LauncherSettingsActivity extends Activity {
     private final ExecutorService wallpaperImporter = Executors.newSingleThreadExecutor();
     private static final int REQUEST_WALLPAPER = 1101;
     private static final int REQUEST_VIDEO_WALLPAPER = 1102;
+    private static final int REQUEST_VIDEO_PROBE = 1103;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -122,12 +127,15 @@ public final class LauncherSettingsActivity extends Activity {
             reverseRow(columnChoices);
             reverseRow(rowChoices);
         }
-        wallpaperChoice = findViewById(R.id.wallpaperChoice);
-        wallpaperChoice.setOnClickListener(v -> showWallpaperGallery());
         wallpaperDimChoice = findViewById(R.id.wallpaperDimChoice);
         wallpaperDimChoice.setOnClickListener(v -> showWallpaperDimPicker());
         videoWallpaperChoice = findViewById(R.id.videoWallpaperChoice);
         videoWallpaperChoice.setOnClickListener(v -> showWallpaperGallery());
+        wallpaperPlaylistSwitch = findViewById(R.id.wallpaperPlaylistSwitch);
+        wallpaperPlaylistSwitch.setOnClickListener(v -> toggleWallpaperPlaylist());
+        wallpaperPlaylistChoice = findViewById(R.id.wallpaperPlaylistChoice);
+        wallpaperPlaylistChoice.setOnClickListener(v -> showWallpaperPlaylistPicker());
+        findViewById(R.id.followThemeChoice).setVisibility(View.GONE);
         glassBlurChoice = findViewById(R.id.glassBlurChoice);
         glassBlurChoice.setOnClickListener(v -> showGlassBlurPicker());
         animationsChoice = findViewById(R.id.animationsChoice);
@@ -159,7 +167,10 @@ public final class LauncherSettingsActivity extends Activity {
                     .remove("advanced_effects").remove(Config.WALLPAPER_CHOICE_KEY)
                     .remove(Config.WALLPAPER_DIM_KEY).remove("background_mode")
                     .remove("video_wallpaper_path").remove("glass_blur_radius")
-                    .remove("reduced_motion").remove("static_cover").commit();
+                    .remove("reduced_motion").remove("static_cover")
+                    .remove(WallpaperPlaylistStore.ENABLED_KEY).remove(WallpaperPlaylistStore.IDS_KEY)
+                    .remove(WallpaperPlaylistStore.CURRENT_KEY).remove(WallpaperPlaylistStore.PENDING_KEY)
+                    .commit();
             Config current = Config.load(this);
             columns = current.columns;
             rowsBelowDock = current.rowsBelowDock;
@@ -178,13 +189,29 @@ public final class LauncherSettingsActivity extends Activity {
             open(new Intent(Settings.ACTION_HOME_SETTINGS));
         });
         homeHelperChoice = findViewById(R.id.homeHelperChoice);
-        homeHelperChoice.setOnClickListener(v -> open(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)));
+        homeHelperChoice.setOnClickListener(v -> {
+            HomeReturnState.configure(this, true);
+            if (!HomeReturnState.systemEnabled(this) || !HomeReturnService.isConnected()) {
+                Toast.makeText(this, R.string.home_return_enable_help, Toast.LENGTH_LONG).show();
+                open(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+            }
+            refreshHomeHelper(homeHelperChoice);
+        });
+        findViewById(R.id.homeNormalBehavior).setOnClickListener(v -> {
+            // Do not explicitly launch Xiaomi's permission-protected HOME Activity.
+            HomeReturnState.setEnabled(this, false);
+            boolean requested = HomeReturnService.openStockAfterPause();
+            refreshHomeHelper(homeHelperChoice);
+            if (!requested) Toast.makeText(this, R.string.home_return_paused_help, Toast.LENGTH_LONG).show();
+        });
         refreshHomeHelper(homeHelperChoice);
         findViewById(R.id.homeSignalSourceChoice).setOnClickListener(v ->
                 open(new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_OPEN_INPUTS)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP)));
         findViewById(R.id.homeScreensaverChoice).setOnClickListener(v ->
-                open(new Intent(Settings.ACTION_DREAM_SETTINGS)));
+                showWallpaperIdlePicker());
+        findViewById(R.id.dockEditorChoice).setOnClickListener(v ->
+                startActivityForResult(new Intent(this, DockEditorActivity.class), MainActivity.DOCK_EDITOR_REQUEST));
         findViewById(R.id.homeAppsChoice).setOnClickListener(v ->
                 open(new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS)));
         findViewById(R.id.tvSettingsChoice).setOnClickListener(v ->
@@ -232,12 +259,11 @@ public final class LauncherSettingsActivity extends Activity {
     }
 
     private void refreshHomeHelper(TextView choice) {
-        String enabled = Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        String service = getPackageName() + "/" + HomeOnlyAccessibilityService.class.getName();
-        boolean active = HomeBootReceiver.isHelperEnabledByUser(this) && RecoveryState.helperEnabled(this);
-        choice.setText(active ? R.string.home_helper_on : R.string.home_helper_off);
-        choice.setContentDescription(getString(R.string.home_helper_open_settings));
+        boolean active = HomeReturnState.enabled(this) && HomeReturnState.systemEnabled(this)
+                && HomeReturnService.isConnected();
+        choice.setText(active ? R.string.home_return_active : R.string.home_return_inactive);
+        choice.setContentDescription(getString(R.string.home_return_description));
+        ((TextView) findViewById(R.id.homeNormalBehavior)).setText(R.string.home_return_pause);
     }
 
     private void reverseRow(TextView[] views) {
@@ -278,9 +304,10 @@ public final class LauncherSettingsActivity extends Activity {
     }
 
     private void applyGlassSurfaces() {
-        int[] ids = {R.id.wallpaperChoice, R.id.wallpaperDimChoice, R.id.glassBlurChoice, R.id.videoWallpaperChoice,
+        int[] ids = {R.id.wallpaperDimChoice, R.id.glassBlurChoice, R.id.videoWallpaperChoice,
+                R.id.wallpaperPlaylistSwitch, R.id.wallpaperPlaylistChoice,
                 R.id.followThemeChoice, R.id.columns4, R.id.columns5, R.id.columns6, R.id.columns7, R.id.rows0,
-                R.id.rows1, R.id.rows2, R.id.rows3, R.id.homeAppsChoice, R.id.animationsChoice, R.id.advancedChoice,
+                R.id.rows1, R.id.rows2, R.id.rows3, R.id.dockEditorChoice, R.id.homeAppsChoice, R.id.animationsChoice, R.id.advancedChoice,
                 R.id.reducedMotionChoice, R.id.staticCoverChoice, R.id.homeSignalSourceChoice, R.id.defaultHomeChoice,
                 R.id.homeHelperChoice, R.id.homeNormalBehavior, R.id.homeScreensaverChoice, R.id.tvSettingsChoice,
                 R.id.homeWifiChoice};
@@ -294,27 +321,185 @@ public final class LauncherSettingsActivity extends Activity {
         TextView category = findViewById(categoryId);
         View section = findViewById(sectionId);
         if (category == null || section == null) return;
-        category.setOnClickListener(v -> settingsScroll.post(() -> settingsScroll.smoothScrollTo(0, section.getTop())));
+        category.setOnClickListener(v -> settingsScroll.post(() -> {
+            settingsScroll.smoothScrollTo(0, section.getTop());
+            if (categoryId == R.id.settingsCategoryApps) findViewById(R.id.dockEditorChoice).requestFocus();
+        }));
+        if (categoryId == R.id.settingsCategoryApps) category.setNextFocusRightId(R.id.dockEditorChoice);
     }
 
     private void showWallpaperGallery() {
         wallpaperCatalog = WallpaperCatalog.load(Config.dir(this));
-        Dialog dialog = new Dialog(this); dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Dialog dialog = new FrostedDialog(this); dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         LinearLayout card = new LinearLayout(this); card.setOrientation(LinearLayout.VERTICAL); card.setPadding(dp(24), dp(20), dp(24), dp(18));
-        card.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 24));
-        TextView title = new TextView(this); title.setText("壁纸"); title.setTextColor(Color.WHITE); title.setTextSize(26); card.addView(title, new LinearLayout.LayoutParams(-1, dp(44)));
+        card.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 24, true));
+        TextView title = new TextView(this); title.setText("动态壁纸"); title.setTextColor(Color.WHITE); title.setTextSize(26); card.addView(title, new LinearLayout.LayoutParams(-1, dp(44)));
         ScrollView scroll = new ScrollView(this); LinearLayout list = new LinearLayout(this); list.setOrientation(LinearLayout.VERTICAL); scroll.addView(list);
         for (WallpaperCandidate candidate : wallpaperCatalog) {
+            if (!candidate.isDynamic()) continue;
             LinearLayout row = new LinearLayout(this); row.setGravity(Gravity.CENTER_VERTICAL); row.setFocusable(true); row.setClickable(true); row.setPadding(dp(10), dp(6), dp(14), dp(6)); row.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 14));
             ImageView thumb = new ImageView(this); thumb.setScaleType(ImageView.ScaleType.CENTER_CROP); Bitmap image = candidateThumbnail(candidate); if (image != null) thumb.setImageBitmap(image); row.addView(thumb, new LinearLayout.LayoutParams(dp(150), dp(84)));
-            TextView label = new TextView(this); label.setText(candidate.title + (candidate.isDynamic() ? "\n动态" : candidate.type == WallpaperCandidate.Type.DEFAULT ? "\n系统默认" : "\n图片")); label.setTextColor(Color.WHITE); label.setTextSize(18); label.setGravity(Gravity.CENTER_VERTICAL); label.setPadding(dp(16), 0, 0, 0); row.addView(label, new LinearLayout.LayoutParams(0, dp(84), 1f));
-            row.setOnClickListener(v -> { dialog.dismiss(); showCandidatePreview(candidate); });
+            TextView label = new TextView(this); label.setText(candidate.title + (candidate.isDynamic() ? "\n动态 · 原始规格" : candidate.type == WallpaperCandidate.Type.DEFAULT ? "\n系统默认" : "\n图片")); label.setTextColor(Color.WHITE); label.setTextSize(18); label.setGravity(Gravity.CENTER_VERTICAL); label.setPadding(dp(16), 0, 0, 0); row.addView(label, new LinearLayout.LayoutParams(0, dp(84), 1f));
+            row.setOnClickListener(v -> {
+                row.setEnabled(false);
+                label.setText(candidate.title + "\n正在校验原始视频…");
+                wallpaperImporter.execute(() -> {
+                    String failure = null;
+                    boolean needsProbe = false;
+                    try {
+                        if (candidate.isDynamic()) {
+                            File file = WallpaperCatalog.resolve(Config.dir(this), candidate.relativeFile);
+                            if (file == null || !file.isFile()) throw new IOException("视频不存在");
+                            VideoSourceInfo info = VideoSourceInfo.inspect(file);
+                            if (VideoWallpaperPolicy.validate(file.getName(), file.length(), info.width, info.height,
+                                    info.durationMs, info.fps, info.mime, info.sdr) != VideoWallpaperPolicy.Result.VALID)
+                                throw new IOException("此视频的原始规格暂不支持");
+                            needsProbe = info.needsNativeSurface(file.length()) && !info.canPlayOriginal(this, file);
+                            // The probe verifies original bytes itself; do not read a 1.9 GiB source twice.
+                            if (!needsProbe && !candidate.sha256.isEmpty()
+                                    && !candidate.sha256.equalsIgnoreCase(VideoWallpaperImport.sha256(file)))
+                                throw new IOException("视频校验失败，请重新导入");
+                        }
+                    } catch (Exception error) { failure = error.getMessage(); }
+                    final String message = failure;
+                    final boolean verifyHardware = needsProbe;
+                    runOnUiThread(() -> {
+                        if (isDestroyed() || isFinishing() || !dialog.isShowing()) return;
+                        row.setEnabled(true);
+                        label.setText(candidate.title + (candidate.isDynamic() ? "\n动态 · 原始规格" : "\n图片"));
+                        if (message != null) Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                        else if (verifyHardware) {
+                            dialog.dismiss();
+                            startActivityForResult(new Intent(this, VideoCompatibilityProbeActivity.class)
+                                    .putExtra("wallpaper_id", candidate.id), REQUEST_VIDEO_PROBE);
+                        } else { dialog.dismiss(); showCandidatePreview(candidate); }
+                    });
+                });
+            });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(96)); lp.bottomMargin = dp(10); list.addView(row, lp);
         }
+        if (list.getChildCount() == 0) {
+            TextView empty = new TextView(this); empty.setText("暂无可用动态壁纸，请导入视频");
+            empty.setTextColor(Color.WHITE); empty.setTextSize(18); list.addView(empty);
+        }
         LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(-1, dp(350)); slp.topMargin = dp(12); card.addView(scroll, slp);
-        LinearLayout actions = new LinearLayout(this); actions.setGravity(Gravity.END); TextView importImage = action("导入图片"); importImage.setOnClickListener(v -> { dialog.dismiss(); openWallpaperDocument(); }); TextView importVideo = action("导入视频"); importVideo.setOnClickListener(v -> { dialog.dismiss(); openVideoDocument(); }); TextView cancel = action("返回"); cancel.setOnClickListener(v -> dialog.dismiss()); actions.addView(importImage); actions.addView(importVideo); actions.addView(cancel); LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(-1, dp(50)); alp.topMargin = dp(14); card.addView(actions, alp);
+        LinearLayout actions = new LinearLayout(this); actions.setGravity(Gravity.END); TextView importVideo = action("导入视频"); importVideo.setOnClickListener(v -> { dialog.dismiss(); openVideoDocument(); }); TextView cancel = action("返回"); cancel.setOnClickListener(v -> dialog.dismiss()); actions.addView(importVideo); actions.addView(cancel); LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(-1, dp(50)); alp.topMargin = dp(14); card.addView(actions, alp);
         dialog.setContentView(card); dialog.setCanceledOnTouchOutside(true); Window window = dialog.getWindow(); if (window != null) { window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); }
         dialog.show(); if (window != null) window.setLayout(Math.min(dp(760), getResources().getDisplayMetrics().widthPixels - dp(72)), -2);
+    }
+
+    private void toggleWallpaperPlaylist() {
+        WallpaperPlaylistStore store = new WallpaperPlaylistStore(this);
+        List<WallpaperCandidate> visible = WallpaperCatalog.visibleVideos(Config.dir(this));
+        List<String> ids = WallpaperPlaylistPolicy.normalizeSelection(visible, store.ids());
+        if (store.enabled()) {
+            store.setEnabled(false, store.currentId());
+            setResult(RESULT_OK);
+            Toast.makeText(this, "壁纸轮播已关闭，恢复单张壁纸", Toast.LENGTH_SHORT).show();
+            refresh();
+            return;
+        }
+        if (!WallpaperPlaylistPolicy.canEnable(ids)) {
+            Toast.makeText(this, "请至少选择一张动态壁纸", Toast.LENGTH_SHORT).show();
+            showWallpaperPlaylistPicker();
+            return;
+        }
+        String fixed = choices.getString(Config.WALLPAPER_CHOICE_KEY, "");
+        String current = ids.contains(store.currentId()) ? store.currentId() : ids.contains(fixed) ? fixed : ids.get(0);
+        if (!fixed.equals(current)) WallpaperPlaylistStore.clearBookmark(this, current);
+        store.enableWithSelection(ids, current);
+        setResult(RESULT_OK);
+        Toast.makeText(this, "壁纸轮播已开启", Toast.LENGTH_SHORT).show();
+        refresh();
+    }
+
+    /** Selector edits only an in-memory ordered ID set; Save is the single persistence boundary. */
+    private void showWallpaperPlaylistPicker() {
+        wallpaperCatalog = WallpaperCatalog.load(Config.dir(this));
+        List<WallpaperCandidate> visible = WallpaperCatalog.visibleVideos(Config.dir(this));
+        WallpaperPlaylistStore store = new WallpaperPlaylistStore(this);
+        List<String> saved = WallpaperPlaylistPolicy.normalizeSelection(visible, store.ids());
+        Set<String> selected = new LinkedHashSet<>(saved);
+        Dialog dialog = new FrostedDialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(dp(24), dp(20), dp(24), dp(18));
+        card.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 24, true));
+        TextView title = new TextView(this);
+        title.setText("选择轮播壁纸"); title.setTextColor(Color.WHITE); title.setTextSize(26);
+        card.addView(title, new LinearLayout.LayoutParams(-1, dp(44)));
+        ScrollView scroll = new ScrollView(this);
+        LinearLayout list = new LinearLayout(this); list.setOrientation(LinearLayout.VERTICAL);
+        scroll.addView(list);
+        List<TextView> labels = new ArrayList<>();
+        List<WallpaperCandidate> rows = new ArrayList<>();
+        for (WallpaperCandidate candidate : visible) {
+            rows.add(candidate);
+            LinearLayout row = new LinearLayout(this);
+            row.setGravity(Gravity.CENTER_VERTICAL); row.setFocusable(true); row.setClickable(true);
+            row.setPadding(dp(10), dp(6), dp(14), dp(6));
+            row.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 14));
+            ImageView thumb = new ImageView(this); thumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            Bitmap image = candidateThumbnail(candidate); if (image != null) thumb.setImageBitmap(image);
+            row.addView(thumb, new LinearLayout.LayoutParams(dp(150), dp(84)));
+            TextView label = new TextView(this); label.setTextColor(Color.WHITE); label.setTextSize(18);
+            label.setGravity(Gravity.CENTER_VERTICAL); label.setPadding(dp(16), 0, 0, 0);
+            labels.add(label); row.addView(label, new LinearLayout.LayoutParams(0, dp(84), 1f));
+            row.setOnClickListener(v -> {
+                if (!selected.add(candidate.id)) selected.remove(candidate.id);
+                updatePlaylistLabels(rows, labels, selected);
+            });
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, dp(96));
+            lp.bottomMargin = dp(10); list.addView(row, lp);
+        }
+        if (rows.isEmpty()) {
+            TextView empty = new TextView(this); empty.setText("暂无可用动态壁纸");
+            empty.setTextColor(Color.WHITE); empty.setTextSize(18); list.addView(empty);
+        }
+        updatePlaylistLabels(rows, labels, selected);
+        LinearLayout.LayoutParams slp = new LinearLayout.LayoutParams(-1, dp(350));
+        slp.topMargin = dp(12); card.addView(scroll, slp);
+        LinearLayout actions = new LinearLayout(this); actions.setGravity(Gravity.END);
+        TextView save = action("保存");
+        save.setOnClickListener(v -> {
+            List<String> ordered = WallpaperPlaylistPolicy.reconcileSelection(visible, saved,
+                    new ArrayList<>(selected));
+            if (ordered.isEmpty()) {
+                // Saving an empty active list is an atomic disable; when already off it simply
+                // clears the ordered intent and does not enable anything.
+                store.saveSelection(ordered);
+                if (store.enabled()) store.setEnabled(false, store.currentId());
+                setResult(RESULT_OK); dialog.dismiss(); refresh();
+                return;
+            }
+            String oldCurrent = store.currentId();
+            store.saveSelection(ordered);
+            if (store.enabled() && !ordered.contains(oldCurrent))
+                WallpaperPlaylistStore.clearBookmark(this, ordered.get(0));
+            setResult(RESULT_OK); dialog.dismiss(); refresh();
+        });
+        TextView cancel = action("取消"); cancel.setOnClickListener(v -> dialog.dismiss());
+        actions.addView(save); actions.addView(cancel);
+        LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(-1, dp(50));
+        alp.topMargin = dp(14); card.addView(actions, alp);
+        dialog.setContentView(card); dialog.setCanceledOnTouchOutside(false);
+        Window window = dialog.getWindow();
+        if (window != null) { window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND); }
+        dialog.show();
+        if (window != null) window.setLayout(Math.min(dp(760), getResources().getDisplayMetrics().widthPixels - dp(72)), -2);
+        if (list.getChildCount() > 0) list.getChildAt(0).requestFocus();
+    }
+
+    private void updatePlaylistLabels(List<WallpaperCandidate> rows, List<TextView> labels, Set<String> selected) {
+        int sequence = 1;
+        for (int i = 0; i < rows.size(); i++) {
+            WallpaperCandidate candidate = rows.get(i);
+            boolean checked = selected.contains(candidate.id);
+            labels.get(i).setText((checked ? "✓ " : "○ ") + candidate.title
+                    + (checked ? "\n轮播顺序 " + sequence++ : "\n动态 · 原始规格"));
+        }
     }
 
     private TextView action(String text) { TextView view = new TextView(this); view.setText(text); view.setTextColor(Color.WHITE); view.setTextSize(17); view.setGravity(Gravity.CENTER); view.setFocusable(true); view.setClickable(true); view.setPadding(dp(12), 0, dp(12), 0); view.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 14)); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, -1, 1f); lp.setMarginStart(dp(6)); view.setLayoutParams(lp); return view; }
@@ -325,17 +510,24 @@ public final class LauncherSettingsActivity extends Activity {
 
     private void showCandidatePreview(WallpaperCandidate candidate) {
         closePreview();
-        Dialog dialog = new Dialog(this); dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); LinearLayout card = new LinearLayout(this); card.setOrientation(LinearLayout.VERTICAL); card.setPadding(dp(24), dp(20), dp(24), dp(18)); card.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 24)); TextView title = new TextView(this); title.setText(candidate.title + (candidate.isDynamic() ? " · 动态" : "")); title.setTextColor(Color.WHITE); title.setTextSize(26); card.addView(title, new LinearLayout.LayoutParams(-1, dp(44)));
+        Dialog dialog = new FrostedDialog(this); dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); LinearLayout card = new LinearLayout(this); card.setOrientation(LinearLayout.VERTICAL); card.setPadding(dp(24), dp(20), dp(24), dp(18)); card.setBackground(new GlassPanelDrawable(getResources().getDisplayMetrics().density, 24, true)); TextView title = new TextView(this); title.setText(candidate.title + (candidate.isDynamic() ? " · 动态" : "")); title.setTextColor(Color.WHITE); title.setTextSize(26); card.addView(title, new LinearLayout.LayoutParams(-1, dp(44)));
         FrameLayout media = new FrameLayout(this); ImageView poster = new ImageView(this); poster.setScaleType(ImageView.ScaleType.CENTER_CROP); Bitmap thumb = candidateThumbnail(candidate); if (thumb != null) poster.setImageBitmap(thumb); media.addView(poster, new FrameLayout.LayoutParams(-1, dp(270))); final VideoWallpaperPlayer[] player = new VideoWallpaperPlayer[1]; if (candidate.isDynamic()) { File file = WallpaperCatalog.resolve(Config.dir(this), candidate.relativeFile); if (file != null) { TextureView texture = new TextureView(this); media.addView(texture, new FrameLayout.LayoutParams(-1, dp(270))); player[0] = new VideoWallpaperPlayer(this, texture, file, BackgroundResourceCoordinator.Owner.PREVIEW, () -> poster.setVisibility(View.VISIBLE)); } } card.addView(media);
-        LinearLayout actions = new LinearLayout(this); actions.setGravity(Gravity.END); TextView apply = action("设为壁纸"); apply.setOnClickListener(v -> { applyCandidate(candidate); dialog.dismiss(); }); TextView back = action("返回"); back.setOnClickListener(v -> dialog.dismiss()); actions.addView(apply); actions.addView(back); LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(-1, dp(50)); alp.topMargin = dp(14); card.addView(actions, alp); dialog.setContentView(card); dialog.setOnShowListener(v -> { if (player[0] != null) player[0].start(); }); dialog.setOnDismissListener(v -> { if (player[0] != null) player[0].close(); if (activePreview == dialog) activePreview = null; }); activePreview = dialog; Window window = dialog.getWindow(); if (window != null) window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); dialog.show(); if (window != null) window.setLayout(Math.min(dp(760), getResources().getDisplayMetrics().widthPixels - dp(72)), -2);
+        LinearLayout actions = new LinearLayout(this); actions.setGravity(Gravity.END); TextView apply = action("设为壁纸"); apply.setOnClickListener(v -> { dialog.dismiss(); applyCandidate(candidate); }); TextView back = action("返回"); back.setOnClickListener(v -> dialog.dismiss()); actions.addView(apply); actions.addView(back); LinearLayout.LayoutParams alp = new LinearLayout.LayoutParams(-1, dp(50)); alp.topMargin = dp(14); card.addView(actions, alp); dialog.setContentView(card); dialog.setOnShowListener(v -> { if (player[0] != null) player[0].start(); }); dialog.setOnDismissListener(v -> { if (player[0] != null) player[0].close(); if (activePreview == dialog) activePreview = null; }); activePreview = dialog; Window window = dialog.getWindow(); if (window != null) window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT)); dialog.show(); if (window != null) window.setLayout(Math.min(dp(760), getResources().getDisplayMetrics().widthPixels - dp(72)), -2);
     }
 
     private void applyCandidate(WallpaperCandidate candidate) {
-        SharedPreferences.Editor editor = choices.edit().putString("background_mode", candidate.isDynamic() ? "video" : "image");
+        // Choosing a fixed wallpaper is an atomic mode change: playlist intent/list remains,
+        // but no automatic EOS callback may continue after the user explicitly chose this item.
+        SharedPreferences.Editor editor = choices.edit()
+                .putBoolean(WallpaperPlaylistStore.ENABLED_KEY, false)
+                .putString("background_mode", candidate.isDynamic() ? "video" : "image");
+        if (candidate.isDynamic()) { editor.putBoolean("static_cover", false); staticCover = false; }
         if (candidate.type == WallpaperCandidate.Type.DEFAULT) editor.remove(Config.WALLPAPER_CHOICE_KEY).remove("video_wallpaper_path");
         else if (candidate.isDynamic()) editor.putString(Config.WALLPAPER_CHOICE_KEY, candidate.id).putString("video_wallpaper_path", WallpaperCatalog.resolve(Config.dir(this), candidate.relativeFile).getAbsolutePath());
         else editor.putString(Config.WALLPAPER_CHOICE_KEY, new File(candidate.relativeFile).getName()).remove("video_wallpaper_path");
-        editor.apply(); setResult(RESULT_OK); Toast.makeText(this, R.string.wallpaper_applied, Toast.LENGTH_SHORT).show(); refresh(); showSettingsBackdrop(Config.load(this));
+        editor.commit(); setResult(RESULT_OK);
+        Toast.makeText(this, candidate.isDynamic() ? "已切换为单张播放" : getString(R.string.wallpaper_applied), Toast.LENGTH_SHORT).show();
+        refresh(); showSettingsBackdrop(Config.load(this));
     }
 
     private WallpaperCandidate findCandidate(String id) { for (WallpaperCandidate candidate : wallpaperCatalog) if (candidate.id.equals(id)) return candidate; return null; }
@@ -362,6 +554,19 @@ public final class LauncherSettingsActivity extends Activity {
         } catch (ActivityNotFoundException e) {
             Toast.makeText(this, R.string.wallpaper_picker_unavailable, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void showWallpaperIdlePicker() {
+        final int[] minutes = {0, 1, 2, 4, 5, 10, 15, 30};
+        String[] labels = {"关闭", "1 分钟", "2 分钟", "4 分钟", "5 分钟", "10 分钟", "15 分钟", "30 分钟"};
+        int current = WallpaperIdlePolicy.normalizeMinutes(choices.getInt(WallpaperIdlePolicy.KEY, 4));
+        int selected = 3;
+        for (int i = 0; i < minutes.length; i++) if (minutes[i] == current) selected = i;
+        new GlassDialog.Builder(this).setTitle("闲置后只显示壁纸")
+                .setSingleChoiceItems(labels, selected, (dialog, which) -> {
+                    choices.edit().putInt(WallpaperIdlePolicy.KEY, minutes[which]).apply();
+                    setResult(RESULT_OK); dialog.dismiss(); refresh();
+                }).setNegativeButton(android.R.string.cancel, null).show();
     }
 
     private void showGlassBlurPicker() {
@@ -439,19 +644,20 @@ public final class LauncherSettingsActivity extends Activity {
         advancedChoice.setAlpha(animations ? 1f : 0.5f);
         String wallpaperCurrent = choices.getString(Config.WALLPAPER_CHOICE_KEY, null);
         WallpaperCandidate selectedWallpaper = findCandidateForSelection(wallpaperCurrent);
-        wallpaperChoice.setText(getString(R.string.wallpaper_state,
-                "none".equals(wallpaperCurrent) ? getString(R.string.wallpaper_none)
-                        : selectedWallpaper != null ? selectedWallpaper.title
-                        : wallpaperCurrent != null ? wallpaperCurrent
-                        : getString(R.string.wallpaper_theme_default)));
         int dim = WallpaperImport.normalizeDim(choices.getInt(
                 Config.WALLPAPER_DIM_KEY, Config.DEFAULT_WALLPAPER_DIM));
         wallpaperDimChoice.setText(getString(R.string.wallpaper_dim_state, dim));
-        String videoPath = choices.getString("video_wallpaper_path", "");
-        WallpaperCandidate selectedVideo = findCandidateForSelection(videoPath);
-        videoWallpaperChoice.setText(getString(R.string.video_wallpaper_state,
-                videoPath.isEmpty() ? getString(R.string.video_wallpaper_none)
-                        : selectedVideo != null ? selectedVideo.title : new File(videoPath).getName()));
+        videoWallpaperChoice.setText("选择壁纸：" + (selectedWallpaper != null ? selectedWallpaper.title
+                : "none".equals(wallpaperCurrent) ? "无" : "跟随主题")
+                + (selectedWallpaper != null && selectedWallpaper.isDynamic() ? " · 动态" : ""));
+        WallpaperPlaylistStore playlist = new WallpaperPlaylistStore(this);
+        List<String> ids = WallpaperPlaylistPolicy.normalizeSelection(
+                WallpaperCatalog.visibleVideos(Config.dir(this)), playlist.ids());
+        wallpaperPlaylistSwitch.setText("壁纸轮播：" + (playlist.enabled() ? "开启" : "关闭"));
+        wallpaperPlaylistChoice.setText("选择轮播壁纸：已选 " + ids.size() + " 张 · 播完切换");
+        int idleMinutes = WallpaperIdlePolicy.normalizeMinutes(choices.getInt(WallpaperIdlePolicy.KEY, 4));
+        ((TextView) findViewById(R.id.homeScreensaverChoice)).setText("壁纸屏保："
+                + (idleMinutes == 0 ? "关闭" : idleMinutes + " 分钟"));
         if (glassBlurChoice != null) glassBlurChoice.setText("设置背景模糊：" + (glassBlurRadius == 0 ? "关闭" : glassBlurRadius >= 8 ? "明显" : "柔和"));
         if (reducedMotionChoice != null) reducedMotionChoice.setText("减少动态效果：" + (reducedMotion ? "开" : "关"));
         if (staticCoverChoice != null) staticCoverChoice.setText("使用静态封面：" + (staticCover ? "开" : "关"));
@@ -464,7 +670,9 @@ public final class LauncherSettingsActivity extends Activity {
                 || choices.contains(Config.WALLPAPER_CHOICE_KEY)
                 || choices.contains(Config.WALLPAPER_DIM_KEY)
                 || choices.contains("video_wallpaper_path") || choices.contains("glass_blur_radius")
-                || choices.contains("reduced_motion") || choices.contains("static_cover");
+                || choices.contains("reduced_motion") || choices.contains("static_cover")
+                || choices.contains(WallpaperPlaylistStore.ENABLED_KEY)
+                || choices.contains(WallpaperPlaylistStore.IDS_KEY);
     }
 
     private void refreshHomeStatus(TextView choice) {
@@ -477,17 +685,32 @@ public final class LauncherSettingsActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_VIDEO_PROBE) {
+            if (resultCode == RESULT_OK && data != null) {
+                wallpaperCatalog = WallpaperCatalog.load(Config.dir(this));
+                WallpaperCandidate candidate = findCandidate(data.getStringExtra("wallpaper_id"));
+                if (candidate != null) showCandidatePreview(candidate);
+            } else Toast.makeText(this, "本机原规格验证未通过，已保留当前壁纸和源文件", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (requestCode == MainActivity.DOCK_EDITOR_REQUEST) {
+            if (resultCode == RESULT_OK) setResult(RESULT_OK);
+            return;
+        }
         if (requestCode == REQUEST_VIDEO_WALLPAPER) {
             if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
             Uri uri = data.getData();
             wallpaperImporter.execute(() -> {
                 try {
                     File imported = VideoWallpaperImport.importVideo(this, uri);
-                    WallpaperCatalog.upsert(Config.dir(this), WallpaperCatalog.videoFor(Config.dir(this), imported, "动态壁纸"));
+                    WallpaperCandidate importedCandidate = WallpaperCatalog.videoFor(Config.dir(this), imported, "动态壁纸");
+                    WallpaperCatalog.upsert(Config.dir(this), importedCandidate);
                     runOnUiThread(() -> {
                         if (isDestroyed() || isFinishing()) return;
-                        choices.edit().putString("background_mode", "video")
-                                .putString("video_wallpaper_path", imported.getAbsolutePath()).apply();
+                        choices.edit().putString("background_mode", "video").putBoolean("static_cover", false)
+                                .putString("video_wallpaper_path", imported.getAbsolutePath())
+                                .putString(Config.WALLPAPER_CHOICE_KEY, importedCandidate.id).apply();
+                        staticCover = false;
                         setResult(RESULT_OK);
                         Toast.makeText(this, R.string.video_wallpaper_imported, Toast.LENGTH_SHORT).show();
                         wallpaperCatalog = WallpaperCatalog.load(Config.dir(this));

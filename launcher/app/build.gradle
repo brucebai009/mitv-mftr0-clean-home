@@ -11,8 +11,8 @@ android {
         applicationId providers.gradleProperty('launcherApplicationId').getOrElse('com.gathin.tvhome')
         minSdk 26
         targetSdk 34
-        versionCode 13
-        versionName '1.0.0-v13.6-repair'
+        versionCode 26
+        versionName '1.0.0-v13.18-icons-player-emby'
         // Distinct names in the stock app list and a system HOME chooser when both IDs coexist.
         resValue 'string', 'launcher_identity_label',
                 applicationId == 'com.ts.launcher' ? 'TVHome（兼容版）' : 'TVHome（原版）'
@@ -37,6 +37,15 @@ android {
         }
     }
 
+    testOptions { unitTests.includeAndroidResources = true }
+
+    if (project.hasProperty('skipLint')) {
+        lint {
+            checkReleaseBuilds false
+            abortOnError false
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
@@ -46,6 +55,10 @@ android {
 dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+    implementation 'androidx.customview:customview:1.0.0'
+    implementation 'androidx.core:core-ktx:1.5.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
     // Test only (never in the APK): plain JVM tests for the module card validators, src/test.
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.13'
 }

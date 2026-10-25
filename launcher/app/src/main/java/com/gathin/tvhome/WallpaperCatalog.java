@@ -22,6 +22,7 @@ import java.util.Locale;
 final class WallpaperCatalog {
     static final int SCHEMA_VERSION = 1;
     static final String FILE_NAME = "wallpaper_catalog.json";
+    static final String EXCLUSIONS_NAME = "wallpaper_excluded_paths.txt";
 
     private WallpaperCatalog() { }
 
@@ -42,6 +43,8 @@ final class WallpaperCatalog {
             }
             ensureDefault(result);
             mergeScannedEntries(root, result);
+            java.util.Set<String> excluded = excludedPaths(root);
+            result.removeIf(item -> excluded.contains(item.relativeFile));
             return result;
         } catch (Exception ignored) {
             return scan(root);
@@ -52,9 +55,11 @@ final class WallpaperCatalog {
         if (root == null || !root.isDirectory() || candidate == null || !validCandidate(root, candidate)) {
             throw new IOException("Invalid wallpaper catalog entry");
         }
+        if (excludedPaths(root).contains(candidate.relativeFile)) throw new IOException("This wallpaper was removed; explicit restoration required");
         List<WallpaperCandidate> entries = new ArrayList<>(load(root));
         for (int i = entries.size() - 1; i >= 0; i--) {
-            if (entries.get(i).id.equals(candidate.id)) entries.remove(i);
+            if (entries.get(i).id.equals(candidate.id) || (!candidate.relativeFile.isEmpty()
+                    && entries.get(i).relativeFile.equals(candidate.relativeFile))) entries.remove(i);
         }
         entries.add(candidate);
         save(root, entries);
@@ -122,8 +127,10 @@ final class WallpaperCatalog {
 
     static WallpaperCandidate videoFor(File root, File file, String title) throws IOException {
         String relative = relativePath(root, file);
-        return new WallpaperCandidate("video-" + shortHash(file), title, WallpaperCandidate.Type.VIDEO,
-                relative, "", sha256(file), 0, 0, 0, 0, "Visualdon", Collections.emptyList());
+        String hash = sha256(file);
+        VideoSourceInfo info = VideoSourceInfo.inspect(file);
+        return new WallpaperCandidate("video-" + hash.substring(0, 16), title, WallpaperCandidate.Type.VIDEO,
+                relative, "", hash, info.width, info.height, info.fps, info.durationMs, "", Collections.emptyList());
     }
 
     private static boolean validCandidate(File root, WallpaperCandidate candidate) {
@@ -133,7 +140,9 @@ final class WallpaperCatalog {
         if (candidate.type == WallpaperCandidate.Type.VIDEO && !candidate.relativeFile.toLowerCase(Locale.ROOT).endsWith(".mp4")) return false;
         if (candidate.type == WallpaperCandidate.Type.IMAGE && !WallpaperImport.supportedExtension(candidate.relativeFile)) return false;
         if (!candidate.posterRelativeFile.isEmpty() && resolve(root, candidate.posterRelativeFile) == null) return false;
-        return candidate.sha256.isEmpty() || candidate.sha256.equalsIgnoreCase(safeDigest(media));
+        // Byte integrity is verified by the importer / installer, and on explicit selection
+        // in a background worker. Never hash a 600 MiB file during Home/UI construction.
+        return true;
     }
 
     private static List<WallpaperCandidate> scan(File root) {
@@ -153,10 +162,12 @@ final class WallpaperCatalog {
         if (videoFiles != null) {
             java.util.Arrays.sort(videoFiles, Comparator.comparing(File::getName, String.CASE_INSENSITIVE_ORDER));
             for (File file : videoFiles) result.add(new WallpaperCandidate(
-                    "video-" + shortHash(file), "动态壁纸", WallpaperCandidate.Type.VIDEO,
-                    "videos/" + file.getName(), "", safeDigest(file), 0, 0, 0, 0, "", Collections.emptyList()));
+                    "video-file-" + file.getName(), "动态壁纸", WallpaperCandidate.Type.VIDEO,
+                    "videos/" + file.getName(), "", "", 0, 0, 0, 0, "", Collections.emptyList()));
         }
         ensureDefault(result);
+        java.util.Set<String> excluded = excludedPaths(root);
+        result.removeIf(item -> excluded.contains(item.relativeFile));
         return result;
     }
 
@@ -177,7 +188,7 @@ final class WallpaperCatalog {
     }
 
     private static WallpaperCandidate image(String id, String title, String path, File root) {
-        return new WallpaperCandidate(id, title, WallpaperCandidate.Type.IMAGE, path, "", safeDigest(resolve(root, path)), 0, 0, 0, 0, "", Collections.emptyList());
+        return new WallpaperCandidate(id, title, WallpaperCandidate.Type.IMAGE, path, "", "", 0, 0, 0, 0, "", Collections.emptyList());
     }
 
     private static void ensureDefault(List<WallpaperCandidate> entries) {
@@ -185,10 +196,69 @@ final class WallpaperCatalog {
         entries.add(WallpaperCandidate.defaultBackground());
     }
 
+
+    static List<WallpaperCandidate> visibleVideos(File root) {
+        List<WallpaperCandidate> result = new ArrayList<>();
+        for (WallpaperCandidate item : load(root)) if (item.isDynamic()) result.add(item);
+        return result;
+    }
+
+    static java.util.Set<String> excludedPaths(File root) {
+        java.util.Set<String> paths = new java.util.LinkedHashSet<>();
+        try {
+            for (String line : readText(new File(root, EXCLUSIONS_NAME)).split("\\n"))
+                if (safeRelative(line.trim())) paths.add(line.trim());
+        } catch (IOException ignored) { }
+        return paths;
+    }
+
+    static void excludePaths(File root, java.util.Set<String> added) throws IOException {
+        java.util.Set<String> paths = excludedPaths(root);
+        for (String path : added) if (safeRelative(path)) paths.add(path);
+        File target = new File(root, EXCLUSIONS_NAME);
+        File temporary = new File(root, "." + EXCLUSIONS_NAME + ".tmp");
+        try (FileOutputStream output = new FileOutputStream(temporary)) {
+            output.write((String.join("\n", paths) + "\n").getBytes(StandardCharsets.UTF_8));
+            output.getFD().sync();
+        }
+        try {
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException unsupported) {
+            Files.move(temporary.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } finally { if (temporary.isFile()) temporary.delete(); }
+    }
+
+    static JSONObject remove(File root, boolean images, java.util.Set<String> ids,
+                             String selectedId, String selectedPath, String activePath) throws Exception {
+        WallpaperRemovalPlan plan = WallpaperRemovalPlan.create(load(root), images, ids, selectedId,
+                relativeOrEmpty(root, selectedPath), relativeOrEmpty(root, activePath));
+        // Persist tombstones BEFORE any deletion: a failed delete or scan can never resurrect these choices.
+        excludePaths(root, plan.paths);
+        save(root, plan.keep);
+        JSONArray deleted = new JSONArray(), retained = new JSONArray();
+        for (String path : plan.paths) {
+            File file = resolve(root, path);
+            if (file != null && (!file.exists() || file.isFile() && file.delete())) deleted.put(path);
+            else retained.put(path);
+        }
+        JSONObject result = new JSONObject();
+        result.put("removedIds", new JSONArray(plan.removedIds));
+        result.put("deletedPaths", deleted); result.put("hiddenButRetained", retained);
+        result.put("protectedVideoPosters", new JSONArray(plan.protectedPosters));
+        return result;
+    }
+
+    private static String relativeOrEmpty(File root, String path) {
+        try { return path == null || path.isEmpty() ? "" : relativePath(root, new File(path)); }
+        catch (IOException ignored) { return ""; }
+    }
+
     private static String readText(File file) throws IOException {
         try (FileInputStream input = new FileInputStream(file)) {
+            if (file.length() <= 0 || file.length() > 1024 * 1024) throw new IOException("Catalog too large");
             byte[] bytes = new byte[(int) file.length()];
-            int count = input.read(bytes);
+            int count = 0, n;
+            while (count < bytes.length && (n = input.read(bytes, count, bytes.length - count)) > 0) count += n;
             return new String(bytes, 0, Math.max(0, count), StandardCharsets.UTF_8);
         }
     }
@@ -214,7 +284,7 @@ final class WallpaperCatalog {
         }
     }
 
-    private static String shortHash(File file) { return safeDigest(file).substring(0, Math.min(16, safeDigest(file).length())); }
+    private static String shortHash(File file) { String hash = safeDigest(file); return hash.substring(0, Math.min(16, hash.length())); }
 
     private static String relativePath(File root, File file) throws IOException {
         if (root == null || file == null) throw new IOException("Missing catalog path");

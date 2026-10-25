@@ -12,7 +12,7 @@ import android.os.Binder;
 
 /**
  * Narrow, privileged recovery bridge for the installer. Only TVHome-owned preferences and the
- * three fixed optional helper components are mutable. No arbitrary Settings keys or Intents.
+ * fixed optional helper components are mutable. No arbitrary Settings keys or Intents.
  */
 public final class RecoveryProvider extends ContentProvider {
 
@@ -26,13 +26,19 @@ public final class RecoveryProvider extends ContentProvider {
         if (!RecoveryContract.isAllowed(method)) throw new IllegalArgumentException("Unsupported recovery operation");
         if (RecoveryContract.OP_STATUS.equals(method)
                 || RecoveryContract.OP_DISABLE_HELPERS.equals(method)
-                || RecoveryContract.OP_RESTORE_HELPERS.equals(method)) {
+                || RecoveryContract.OP_RESTORE_HELPERS.equals(method)
+                || RecoveryContract.OP_HOME_RETURN_ENABLE.equals(method)
+                || RecoveryContract.OP_HOME_RETURN_DISABLE.equals(method)) {
             // Authenticate BEFORE clearing Binder identity. PackageManager must see the owner app
             // changing its own fixed components, not the remote shell caller changing another app.
             long identity = Binder.clearCallingIdentity();
             try {
-                Bundle result = RecoveryContract.OP_STATUS.equals(method) ? status(context)
-                        : HelperComponents.change(context, RecoveryContract.OP_RESTORE_HELPERS.equals(method));
+                Bundle result;
+                if (RecoveryContract.OP_STATUS.equals(method)) result = status(context);
+                else if (RecoveryContract.OP_HOME_RETURN_ENABLE.equals(method)
+                        || RecoveryContract.OP_HOME_RETURN_DISABLE.equals(method)) {
+                    result = HomeReturnState.configure(context, RecoveryContract.OP_HOME_RETURN_ENABLE.equals(method));
+                } else result = HelperComponents.change(context, RecoveryContract.OP_RESTORE_HELPERS.equals(method));
                 result.putString("operation", method);
                 return result;
             } finally { Binder.restoreCallingIdentity(identity); }
@@ -73,6 +79,7 @@ public final class RecoveryProvider extends ContentProvider {
         result.putString("background_mode", choices.getString("background_mode", "image"));
         result.putBoolean("helper_enabled", RecoveryState.helperEnabled(context));
         result.putBoolean("boot_recovery", RecoveryState.bootRecoveryEnabled(context));
+        result.putAll(HomeReturnState.status(context));
         Bundle components = HelperComponents.status(context);
         // content call does not unmarshal nested Bundles when printing. Flatten fixed scalar keys.
         for (String key : components.keySet()) result.putInt(key, components.getInt(key));
