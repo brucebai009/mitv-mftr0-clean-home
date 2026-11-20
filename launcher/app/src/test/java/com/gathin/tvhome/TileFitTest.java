@@ -1,11 +1,16 @@
 package com.gathin.tvhome;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /** AppAdapter.tileWidthPx with rows_below_dock: the dock, its title and the rows must fit the grid's height. */
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 30)
 public class TileFitTest {
 
     private static final float D = 2f;              // 1080p TV: 2 px per dp

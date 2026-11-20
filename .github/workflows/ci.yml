@@ -21,10 +21,11 @@ jobs:
         run: |
           python3 -m venv tools/venv
           tools/venv/bin/pip install -q -r tools/requirements.txt
+          tools/venv/bin/pip install -q pytest
       - name: Example lists, README tables, shell helpers
         env:
           CLEANYOURTV_STRICT: ${{ github.event_name == 'push' && '1' || '' }}
-        run: python3 -m unittest discover -s tests -v
+        run: tools/venv/bin/python -m unittest discover -s tests -v
 
   launcher:
     name: Launcher build and unit tests

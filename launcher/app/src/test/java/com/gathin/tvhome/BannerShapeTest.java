@@ -4,7 +4,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
+// AppAdapter initializes Android Handler/Looper-backed artwork loading.
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 30)
 public class BannerShapeTest {
     @Test
     public void wideBannersAreKept() {
