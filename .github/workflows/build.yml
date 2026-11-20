@@ -59,8 +59,8 @@ jobs:
         if: success()
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ci-v13.2-${{ github.sha }}
-          name: TVHome V13.2 CI unsigned handoff
+          tag_name: ci-${{ github.sha }}
+          name: TVHome CI unsigned handoff
           prerelease: true
           generate_release_notes: false
           body: |

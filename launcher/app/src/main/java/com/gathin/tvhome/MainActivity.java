@@ -2074,8 +2074,15 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
      *  with the same URI instead (XGIMI's HDMI player only answers com.xgimi.action.hdmiPlayer). */
     private void openInput(String inputId) {
         if (deviceProfile != null) {
-            DeviceProfile.Route route = deviceProfile.inputRoute(inputId);
+            // Xiaomi's CEC child IDs have no standard VIEW handler. Use the physical
+            // parent reported by TvInputManager, never a guessed HDMI number/CEC address.
+            TvInputManager inputManager = (TvInputManager) getSystemService(TV_INPUT_SERVICE);
+            TvInputInfo selectedInput = inputManager == null ? null : inputManager.getTvInputInfo(inputId);
+            String parentId = selectedInput == null ? null : selectedInput.getParentId();
+            DeviceProfile.Route route = deviceProfile.inputRoute(inputId, parentId);
             if (route != null) {
+                android.util.Log.i("TvHome.InputRoute", "requested=" + inputId + " parent=" + parentId
+                        + " mapped=" + route.inputId + " input=" + route.inputExtra);
                 open(route.intent());
                 return;
             }
@@ -2086,7 +2093,7 @@ public class MainActivity extends Activity implements AppAdapter.TileListener {
         try {
             startActivity(view);
             return;
-        } catch (ActivityNotFoundException e) {
+        } catch (ActivityNotFoundException | SecurityException e) {
             if (inputAction.isEmpty()) {
                 Toast.makeText(this, R.string.not_available, Toast.LENGTH_SHORT).show();
                 return;

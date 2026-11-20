@@ -314,6 +314,10 @@ public class AppAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             label = AppDisplayLabels.forPackage(pkg, label);
             if (!seen.add(pkg + '\n' + label)) continue;
             Drawable banner = bundledBanner(appBanners.get(pkg));
+            // Keep the TV banner full-bleed in both Dock and library. Explicit theme art wins.
+            if (banner == null && "com.applemusic.lavande".equals(pkg)) {
+                banner = ctx.getDrawable(R.drawable.banner_apple_music_pearl);
+            }
             if (banner == null) banner = loadBanner(pm, ri);
             Drawable icon = ri.loadIcon(pm);
             long lastUpdateTime = 0L;

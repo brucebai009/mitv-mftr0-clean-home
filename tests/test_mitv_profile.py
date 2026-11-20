@@ -35,7 +35,8 @@ def test_route_extras_are_explicit_integers_and_hw8_is_excluded():
 def test_source_and_settings_paths_keep_safe_fallbacks():
     main = MAIN.read_text(encoding="utf-8")
     adapter = ADAPTER.read_text(encoding="utf-8")
-    assert "deviceProfile.inputRoute(inputId)" in main
+    assert "deviceProfile.inputRoute(inputId, parentId)" in main
+    assert "selectedInput.getParentId()" in main
     assert "deviceProfile.settingsIntent()" in main
     assert "DeviceProfile.load(ctx)" in adapter
     assert "com.android.tv.settings" in adapter

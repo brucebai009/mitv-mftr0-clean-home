@@ -165,7 +165,13 @@ final class DeviceProfile {
     }
 
     Route inputRoute(String inputId) {
-        return matched ? inputRoutes.get(inputId) : null;
+        return inputRoute(inputId, null);
+    }
+
+    Route inputRoute(String inputId, String reportedParentId) {
+        if (!matched) return null;
+        String key = InputRoutePolicy.profileKey(inputId, reportedParentId, inputRoutes.keySet());
+        return key == null ? null : inputRoutes.get(key);
     }
 
     boolean isInputExcluded(String inputId) {

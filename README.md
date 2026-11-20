@@ -1,3 +1,5 @@
+> **MFTR0 fork update — v13.18.1 (2026-11-20):** device-tested HDMI-CEC parent routing and full-card Apple Music pearl artwork. The signed compatibility APK is available in this repository's Releases. See [release status and device-check limits](docs/v13.18.1-release-status.md).
+
 <p align="center">
   <a href="https://cleanyour.tv"><img src="https://raw.githubusercontent.com/Gathin23/cleanyourtv/main/docs/banner.png" alt="CleanYourTV. Your TV, minus the ads. Strip the bloatware from any Android TV or Google TV over Wi-Fi and replace the ad-filled home screen with a clean launcher that looks like an Apple TV. No root, no cable, nothing uninstalled, and a one-line restore." width="800"></a>
 </p>
